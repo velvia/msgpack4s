@@ -248,7 +248,7 @@ object MsgPack {
 
     try {
       var size = 0
-      value match {
+      value.toByte match {
         case MP_NULL =>   null
         case MP_FALSE =>  false
         case MP_TRUE =>   true
