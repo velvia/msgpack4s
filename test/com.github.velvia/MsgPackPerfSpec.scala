@@ -8,7 +8,7 @@ class MsgPackPerfSpec extends FunSpec with ShouldMatchers {
   def genMap() = {
     Map("eventType" -> Random.nextInt(25),
         "user" -> "abcDEFghiDEF",
-        "downloads" -> Map("bytes" -> Random.nextInt(1000000), "millis" -> Random.nextInt(50000)),
+        "downloads" -> Map("bytes" -> 123456, "millis" -> Random.nextInt(50000)),
         "someList" -> List.fill(5)(Random.nextInt(16)))
   }
 
