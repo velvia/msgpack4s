@@ -134,8 +134,7 @@ object MsgPack {
    */
   def pack(item: Any, out: DataOutputStream) {
     item match {
-      case null       =>  out.write(MP_NULL)
-      case x: Boolean =>  out.write(if (x) MP_TRUE else MP_FALSE)
+      case x: String =>      writeRawBytes(x.getBytes("UTF-8"), out)
       case n: Number  =>  n.asInstanceOf[Any] match {
           case f: Float =>  out.write(MP_FLOAT); out.writeFloat(f)
           case d: Double => out.write(MP_DOUBLE); out.writeDouble(d)
@@ -175,28 +174,6 @@ object MsgPack {
               }
             }
         }
-      case x: String =>      writeRawBytes(x.getBytes("UTF-8"), out)
-      case b: Array[Byte] => writeRawBytes(b, out)
-      case bb: ByteBuffer =>
-        if (bb.hasArray())
-          writeRawBytes(bb.array, out)
-        else {
-          val data = new Array[Byte](bb.capacity())
-          bb.position(); bb.limit(bb.capacity())
-          bb.get(data)
-          writeRawBytes(data, out)
-        }
-      case s: Seq[_] =>
-        if (s.length <= MAX_4BIT) {
-          out.write(s.length | MP_FIXARRAY)
-        } else if (s.length <= MAX_16BIT) {
-          out.write(MP_ARRAY16)
-          out.writeShort(s.length)
-        } else {
-          out.write(MP_ARRAY32)
-          out.writeInt(s.length)
-        }
-        s foreach { pack(_, out) }
       case map: collection.Map[_, _] =>
         if (map.size <= MAX_4BIT) {
           out.write(map.size | MP_FIXMAP);
@@ -208,6 +185,29 @@ object MsgPack {
           out.writeInt(map.size);
         }
         map foreach { case (k, v) => pack(k, out); pack(v, out) }
+      case s: Seq[_] =>
+        if (s.length <= MAX_4BIT) {
+          out.write(s.length | MP_FIXARRAY)
+        } else if (s.length <= MAX_16BIT) {
+          out.write(MP_ARRAY16)
+          out.writeShort(s.length)
+        } else {
+          out.write(MP_ARRAY32)
+          out.writeInt(s.length)
+        }
+        s foreach { pack(_, out) }
+      case b: Array[Byte] => writeRawBytes(b, out)
+      case bb: ByteBuffer =>
+        if (bb.hasArray())
+          writeRawBytes(bb.array, out)
+        else {
+          val data = new Array[Byte](bb.capacity())
+          bb.position(); bb.limit(bb.capacity())
+          bb.get(data)
+          writeRawBytes(data, out)
+        }
+      case x: Boolean =>  out.write(if (x) MP_TRUE else MP_FALSE)
+      case null       =>  out.write(MP_NULL)
       case item =>
         throw new IllegalArgumentException("Cannot msgpack object of type " + item.getClass().getCanonicalName());
     }
