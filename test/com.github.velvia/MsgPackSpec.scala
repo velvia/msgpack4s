@@ -54,7 +54,6 @@ class MsgPackSpec extends FunSpec with ShouldMatchers {
     it("should serialize and deserialize Maps") {
       val map = Map("type" -> 9, "owner" -> "ev", "stats" -> Map(29 -> 1, "those" -> Seq(1, 2)))
       val unpacked = MsgPack.unpack(MsgPack.pack(map), MsgPack.UNPACK_RAW_AS_STRING).asInstanceOf[Map[_, _]]
-      println("Unpacked map: " + unpacked)
       unpacked should equal (map)
     }
   }
