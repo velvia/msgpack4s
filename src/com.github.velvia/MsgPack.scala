@@ -54,20 +54,13 @@ object MsgPack {
 
   val UNPACK_RAW_AS_STRING = 0x1
   val UNPACK_RAW_AS_BYTE_BUFFER = 0x2
-
-  /**
-   * This is the same as calling unpack(data, 0)
-   * @param data
-   * @return
-   * @throws InvalidMsgPackDataException
-   */
-  def unpack(data: Array[Byte]): Any = unpack(data, 0)
+  val DEFAULT_OPTIONS = UNPACK_RAW_AS_STRING
 
   /**
    * Unpacks the given data.
    *
    * @param packed data
-   * @param int options
+   * @param int options, defaults to DEFAULT_OPTIONS
    * Bitmask of flags to specify how to map certain values back to java types:
    * For raw types:
    *    (no option) - All raw bytes are decoded as a byte[]
@@ -76,7 +69,7 @@ object MsgPack {
    * @return the unpacked data
    * @throws InvalidMsgPackDataException If the given data cannot be unpacked.
    */
-  def unpack(data: Array[Byte], options: Int): Any = {
+  def unpack(data: Array[Byte], options: Int = DEFAULT_OPTIONS): Any = {
     val in = new ByteArrayInputStream(data)
     try {
       unpack(new DataInputStream(in), options)
