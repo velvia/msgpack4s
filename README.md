@@ -1,7 +1,7 @@
 msgpack4s
 =========
 
-A super-simple MessagePack serialization library for Scala, based on msgpack-java-lite
+A super-simple MessagePack serialization library for Scala, based on [msgpack-java-lite](https://bitbucket.org/sirbrialliance/msgpack-java-lite/overview)
 
 * Two basic APIs: `MsgPack.pack(object)` and `MsgPack.unpack(byteArray)`.
 * Directly unpacks maps, sequences, and any non-cyclic nested sequences/maps to Scala immutable collections
