@@ -4,6 +4,8 @@ name := "msgpack4s"
 // $(NEXT_VERSION)-SNAPSHOT afterwards!
 version := "0.1-SNAPSHOT"
 
+organization := "com.github.velvia"
+
 scalaVersion := "2.9.2"
 
 unmanagedSourceDirectories in Compile <++= Seq(baseDirectory(_ / "src" )).join
