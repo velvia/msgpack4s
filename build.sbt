@@ -8,6 +8,8 @@ organization := "com.github.velvia"
 
 scalaVersion := "2.9.2"
 
+crossScalaVersions := Seq("2.9.2", "2.10.0")
+
 unmanagedSourceDirectories in Compile <++= Seq(baseDirectory(_ / "src" )).join
 
 unmanagedSourceDirectories in Test <++= Seq(baseDirectory(_ / "test" )).join
