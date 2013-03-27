@@ -9,8 +9,10 @@ A super-simple MessagePack serialization library for Scala, based on [msgpack-ja
 * No extra dependencies
 * Performance competitive with msgpack-scala
 
+For the exact semantics of packing and unpacking, see the ScalaDoc.
+
 Building, testing, packaging
 ============================
 
     sbt test
-    sbt package
+    sbt "+ package"
