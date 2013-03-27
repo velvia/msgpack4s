@@ -29,7 +29,7 @@ class InvalidMsgPackDataException(msg: String) extends Exception(msg)
  *
  * @author velvia
  */
-object MsgPack {
+object MsgPack extends PackingUtils {
   /**
    * Packs an item using the msgpack protocol.
    *
@@ -52,8 +52,6 @@ object MsgPack {
     out.toByteArray();
   }
 
-  val UNPACK_RAW_AS_STRING = 0x1
-  val UNPACK_RAW_AS_BYTE_BUFFER = 0x2
   val DEFAULT_OPTIONS = UNPACK_RAW_AS_STRING
 
   /**
@@ -79,51 +77,6 @@ object MsgPack {
         throw new RuntimeException("ByteArrayInStream threw an IOException!", ex);
     }
   }
-
-  protected val MAX_4BIT = 0xf
-  protected val MAX_5BIT = 0x1f
-  protected val MAX_7BIT = 0x7f
-  protected val MAX_8BIT = 0xff
-  protected val MAX_15BIT = 0x7fff
-  protected val MAX_16BIT = 0xffff
-  protected val MAX_31BIT = 0x7fffffff
-  protected val MAX_32BIT = 0xffffffffL
-
-  //these values are from http://wiki.msgpack.org/display/MSGPACK/Format+specification
-  protected val MP_NULL = 0xc0.toByte;
-  protected val MP_FALSE = 0xc2.toByte;
-  protected val MP_TRUE = 0xc3.toByte;
-
-  protected val MP_FLOAT = 0xca.toByte;
-  protected val MP_DOUBLE = 0xcb.toByte;
-
-  protected val MP_FIXNUM = 0x00.toByte;//last 7 bits is value
-  protected val MP_UINT8 = 0xcc.toByte;
-  protected val MP_UINT16 = 0xcd.toByte;
-  protected val MP_UINT32 = 0xce.toByte;
-  protected val MP_UINT64 = 0xcf.toByte;
-
-  protected val MP_NEGATIVE_FIXNUM = 0xe0.toByte;//last 5 bits is value
-  protected val MP_NEGATIVE_FIXNUM_INT = 0xe0;//  /me wishes for signed numbers.
-  protected val MP_INT8 = 0xd0.toByte;
-  protected val MP_INT16 = 0xd1.toByte;
-  protected val MP_INT32 = 0xd2.toByte;
-  protected val MP_INT64 = 0xd3.toByte;
-
-  protected val MP_FIXARRAY = 0x90.toByte;//last 4 bits is size
-  protected val MP_FIXARRAY_INT = 0x90;
-  protected val MP_ARRAY16 = 0xdc.toByte;
-  protected val MP_ARRAY32 = 0xdd.toByte;
-
-  protected val MP_FIXMAP = 0x80.toByte;//last 4 bits is size
-  protected val MP_FIXMAP_INT = 0x80;
-  protected val MP_MAP16 = 0xde.toByte;
-  protected val MP_MAP32 = 0xdf.toByte;
-
-  protected val MP_FIXRAW = 0xa0.toByte;//last 5 bits is size
-  protected val MP_FIXRAW_INT = 0xa0;
-  protected val MP_RAW16 = 0xda.toByte;
-  protected val MP_RAW32 = 0xdb.toByte;
 
   /**
    * Packs the item, streaming the data to the given OutputStream.
@@ -174,28 +127,8 @@ object MsgPack {
               }
             }
         }
-      case map: collection.Map[_, _] =>
-        if (map.size <= MAX_4BIT) {
-          out.write(map.size | MP_FIXMAP);
-        } else if (map.size <= MAX_16BIT) {
-          out.write(MP_MAP16);
-          out.writeShort(map.size);
-        } else {
-          out.write(MP_MAP32);
-          out.writeInt(map.size);
-        }
-        map foreach { case (k, v) => pack(k, out); pack(v, out) }
-      case s: Seq[_] =>
-        if (s.length <= MAX_4BIT) {
-          out.write(s.length | MP_FIXARRAY)
-        } else if (s.length <= MAX_16BIT) {
-          out.write(MP_ARRAY16)
-          out.writeShort(s.length)
-        } else {
-          out.write(MP_ARRAY32)
-          out.writeInt(s.length)
-        }
-        s foreach { pack(_, out) }
+      case map: collection.Map[Any, Any] => packMap(map, out)
+      case s: Seq[_] => packSeq(s, out)
       case b: Array[Byte] => writeRawBytes(b, out)
       case bb: ByteBuffer =>
         if (bb.hasArray())
@@ -211,19 +144,6 @@ object MsgPack {
       case item =>
         throw new IllegalArgumentException("Cannot msgpack object of type " + item.getClass().getCanonicalName());
     }
-  }
-
-  private def writeRawBytes(data: Array[Byte], out: DataOutputStream) {
-    if (data.length <= MAX_5BIT) {
-      out.write(data.length | MP_FIXRAW)
-    } else if (data.length <= MAX_16BIT) {
-      out.write(MP_RAW16)
-      out.writeShort(data.length)
-    } else {
-      out.write(MP_RAW32)
-      out.writeInt(data.length)
-    }
-    out.write(data)
   }
 
   /**
@@ -262,8 +182,8 @@ object MsgPack {
         case MP_INT16 => in.readShort()
         case MP_INT32 => in.readInt()
         case MP_INT64 => in.readLong()
-        case MP_ARRAY16 => unpackList(in.readShort() & MAX_16BIT, in, options)
-        case MP_ARRAY32 => unpackList(in.readInt(), in, options);
+        case MP_ARRAY16 => unpackSeq(in.readShort() & MAX_16BIT, in, options)
+        case MP_ARRAY32 => unpackSeq(in.readInt(), in, options);
         case MP_MAP16 => unpackMap(in.readShort() & MAX_16BIT, in, options)
         case MP_MAP32 => unpackMap(in.readInt(), in, options);
         case MP_RAW16 => unpackRaw(in.readShort() & MAX_16BIT, in, options)
@@ -272,7 +192,7 @@ object MsgPack {
           if (value >= MP_NEGATIVE_FIXNUM_INT && value <= MP_NEGATIVE_FIXNUM_INT + MAX_5BIT) {
             value.toByte
           } else if (value >= MP_FIXARRAY_INT && value <= MP_FIXARRAY_INT + MAX_4BIT) {
-            unpackList(value - MP_FIXARRAY_INT, in, options)
+            unpackSeq(value - MP_FIXARRAY_INT, in, options)
           } else if (value >= MP_FIXMAP_INT && value <= MP_FIXMAP_INT + MAX_4BIT) {
             unpackMap(value - MP_FIXMAP_INT, in, options)
           } else if (value >= MP_FIXRAW_INT && value <= MP_FIXRAW_INT + MAX_5BIT) {
@@ -286,33 +206,5 @@ object MsgPack {
       case ex: EOFException =>
         throw new InvalidMsgPackDataException("No more input available when expecting a value");
     }
-  }
-
-  def unpackList(size: Int, in: DataInputStream, options: Int): Seq[_] = {
-    if (size < 0)
-      throw new InvalidMsgPackDataException("Array to unpack too large for Java (more than 2^31 elements)!")
-    Vector((0 until size).map { x => unpack(in, options) } :_*)
-  }
-
-  def unpackMap(size: Int, in: DataInputStream, options: Int): Map[_, _] = {
-    if (size < 0)
-      throw new InvalidMsgPackDataException("Map to unpack too large for Java (more than 2^31 elements)!")
-    var map = collection.immutable.HashMap.empty[Any, Any]
-    (0 until size).foreach { n => map = map + (unpack(in, options) -> unpack(in, options)) }
-    map
-  }
-
-  def unpackRaw(size: Int, in: DataInputStream, options: Int): Any = {
-    if (size < 0)
-      throw new InvalidMsgPackDataException("byte[] to unpack too large for Java (more than 2^31 elements)!")
-
-    val data = new Array[Byte](size)
-    in.read(data)
-
-    if ((options & UNPACK_RAW_AS_BYTE_BUFFER) != 0) {
-      ByteBuffer.wrap(data)
-    } else if ((options & UNPACK_RAW_AS_STRING) != 0) {
-      new String(data, "UTF-8")
-    } else data
   }
 }
