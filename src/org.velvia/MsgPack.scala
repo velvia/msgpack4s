@@ -161,15 +161,20 @@ object MsgPack extends PackingUtils {
 
     try {
       var size = 0
+      // Ordering of statements has a large effect on unpacking time
+      // The current ordering is optimized for short maps, lists, strings, and small numbers
       value.toByte match {
-        case MP_NULL =>   null
-        case MP_FALSE =>  false
-        case MP_TRUE =>   true
-        case MP_FLOAT =>  in.readFloat()
-        case MP_DOUBLE => in.readDouble()
-        case MP_UINT8 =>  in.read()       //read single byte, return as int
+        case b if b >= MP_NEGATIVE_FIXNUM => value.toByte     // All numbers between -32 and +127
+        case b if (b >= MP_FIXRAW && b <= MP_FIXRAW + MAX_5BIT) =>
+          unpackRaw(value - MP_FIXRAW_INT, in, options)
+        case b if (b >= MP_FIXARRAY && b <= MP_FIXARRAY + MAX_4BIT) =>
+          unpackSeq(value - MP_FIXARRAY_INT, in, options)
+        case b if (b >= MP_FIXMAP && b <= MP_FIXMAP + MAX_4BIT) =>
+          unpackMap(value - MP_FIXMAP_INT, in, options)
         case MP_UINT16 => in.readShort() & MAX_16BIT //read short, trick Java into treating it as unsigned, return int
         case MP_UINT32 => in.readInt() & MAX_32BIT //read int, trick Java into treating it as unsigned, return long
+        case MP_INT16 => in.readShort()
+        case MP_INT32 => in.readInt()
         case MP_UINT64 =>
           val v = in.readLong()
           if (v >= 0) v
@@ -178,9 +183,8 @@ object MsgPack extends PackingUtils {
             math.BigInt(1, Array[Byte](((v >> 24) & 0xff).toByte,
                                        ((v >> 16) & 0xff).toByte,
                                        ((v >> 8) & 0xff).toByte, (v & 0xff).toByte))
+        case MP_UINT8 =>  in.read()       //read single byte, return as int
         case MP_INT8 =>  in.read().toByte
-        case MP_INT16 => in.readShort()
-        case MP_INT32 => in.readInt()
         case MP_INT64 => in.readLong()
         case MP_ARRAY16 => unpackSeq(in.readShort() & MAX_16BIT, in, options)
         case MP_ARRAY32 => unpackSeq(in.readInt(), in, options);
@@ -188,18 +192,13 @@ object MsgPack extends PackingUtils {
         case MP_MAP32 => unpackMap(in.readInt(), in, options);
         case MP_RAW16 => unpackRaw(in.readShort() & MAX_16BIT, in, options)
         case MP_RAW32 => unpackRaw(in.readInt(), in, options)
+        case MP_FALSE =>  false
+        case MP_TRUE =>   true
+        case MP_FLOAT =>  in.readFloat()
+        case MP_DOUBLE => in.readDouble()
+        case MP_NULL =>   null
         case _ =>
-          if (value >= MP_NEGATIVE_FIXNUM_INT && value <= MP_NEGATIVE_FIXNUM_INT + MAX_5BIT) {
-            value.toByte
-          } else if (value >= MP_FIXARRAY_INT && value <= MP_FIXARRAY_INT + MAX_4BIT) {
-            unpackSeq(value - MP_FIXARRAY_INT, in, options)
-          } else if (value >= MP_FIXMAP_INT && value <= MP_FIXMAP_INT + MAX_4BIT) {
-            unpackMap(value - MP_FIXMAP_INT, in, options)
-          } else if (value >= MP_FIXRAW_INT && value <= MP_FIXRAW_INT + MAX_5BIT) {
-            unpackRaw(value - MP_FIXRAW_INT, in, options)
-          } else if (value <= MAX_7BIT) { //MP_FIXNUM - the value is value as an int
-            value
-          } else throw new InvalidMsgPackDataException("Input contains invalid type value")
+          throw new InvalidMsgPackDataException("Input contains invalid type value")
       }
 
     } catch {
