@@ -4,7 +4,7 @@ name := "msgpack4s"
 // $(NEXT_VERSION)-SNAPSHOT afterwards!
 version := "0.2-SNAPSHOT"
 
-organization := "com.github.velvia"
+organization := "org.velvia"
 
 scalaVersion := "2.9.2"
 

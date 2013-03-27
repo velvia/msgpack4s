@@ -1,4 +1,4 @@
-package com.github.velvia
+package org.velvia
 
 import util.Random
 import org.scalatest.FunSpec

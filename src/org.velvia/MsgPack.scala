@@ -1,4 +1,4 @@
-package com.github.velvia
+package org.velvia
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
