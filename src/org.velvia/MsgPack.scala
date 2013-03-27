@@ -20,11 +20,11 @@ class InvalidMsgPackDataException(msg: String) extends Exception(msg)
  * - null
  * - Boolean
  * - Number
- *     byte, short, int, and long are considered interchangeable when
- *     packing/unpacking, BigInt's will be used for large values in uint64 values
+ *     byte, short, int, and long will be packed and unpacked into the smallest possible representation,
+ *     BigInt's will be used for anything larger than long.MAX_VALUE
  * - String (UTF-8), byte[], or ByteBuffer (the *whole* buffer) (always unpacked as a byte[] unless you ask for something else)
- * - Map (any type may be used for packing, always unpacked as a HashMap)
- * - Seq (any type may be used for packing, always unpacked as a Vector)
+ * - Map (any Map may be used for packing, always unpacked as a HashMap)
+ * - Seq (any Seq may be used for packing, always unpacked as a Vector)
  * Passing any other types will throw an IllegalArumentException.
  *
  * @author velvia
