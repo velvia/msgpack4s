@@ -98,7 +98,13 @@ trait PackingUtils {
   protected def unpackSeq(size: Int, in: DataInputStream, options: Int): Seq[_] = {
     if (size < 0)
       throw new InvalidMsgPackDataException("Array to unpack too large for Java (more than 2^31 elements)!")
-    Vector((0 until size).map { x => unpack(in, options) } :_*)
+    var vec = Vector.empty[Any]
+    var i = 0
+    while (i < size) {
+      vec = vec :+ unpack(in, options)
+      i += 1
+    }
+    vec
   }
 
   protected def unpackMap(size: Int, in: DataInputStream, options: Int): Map[_, _] = {
