@@ -82,6 +82,23 @@ trait PackingUtils {
     s foreach { pack(_, out) }
   }
 
+  protected def packArray[T](a: Array[T], out: DataOutputStream) {
+    if (a.length <= MAX_4BIT) {
+      out.write(a.length | MP_FIXARRAY)
+    } else if (a.length <= MAX_16BIT) {
+      out.write(MP_ARRAY16)
+      out.writeShort(a.length)
+    } else {
+      out.write(MP_ARRAY32)
+      out.writeInt(a.length)
+    }
+    var i = 0
+    while (i < a.length) {
+      pack(a(i), out)
+      i += 1
+    }
+  }
+
   protected def writeRawBytes(data: Array[Byte], out: DataOutputStream) {
     if (data.length <= MAX_5BIT) {
       out.write(data.length | MP_FIXRAW)

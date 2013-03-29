@@ -51,6 +51,23 @@ class MsgPackSpec extends FunSpec with ShouldMatchers {
       }
     }
 
+    it("should serialize and deserialize arrays, Nil, mixed sequences") {
+      val array = Array(1, 2, -3)
+      val unpacked = MsgPack.unpack(MsgPack.pack(array)).asInstanceOf[Seq[Any]]
+      unpacked.getClass should equal (classOf[Vector[Int]])
+      unpacked should have length (array.size)
+      assert(unpacked.sameElements(array))
+
+      val nil = Nil
+      val unpacked1 = MsgPack.unpack(MsgPack.pack(nil)).asInstanceOf[Seq[Any]]
+      unpacked1 should have length (0)
+
+      val vec = Vector("a", 4, true, null)
+      val unpacked2 = MsgPack.unpack(MsgPack.pack(vec)).asInstanceOf[Seq[Any]]
+      unpacked2 should have length (vec.length)
+      unpacked2 should equal (vec)
+    }
+
     it("should serialize and deserialize Maps") {
       val map = Map("type" -> 9, "owner" -> "ev", "stats" -> Map(29 -> 1, "those" -> Seq(1, 2)))
       val unpacked = MsgPack.unpack(MsgPack.pack(map), MsgPack.UNPACK_RAW_AS_STRING).asInstanceOf[Map[_, _]]

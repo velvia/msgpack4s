@@ -128,8 +128,9 @@ object MsgPack extends PackingUtils {
             }
         }
       case map: collection.Map[Any, Any] => packMap(map, out)
-      case s: Seq[_] => packSeq(s, out)
+      case s: Seq[_]      => packSeq(s, out)
       case b: Array[Byte] => writeRawBytes(b, out)
+      case a: Array[_]    => packArray(a, out)
       case bb: ByteBuffer =>
         if (bb.hasArray())
           writeRawBytes(bb.array, out)
