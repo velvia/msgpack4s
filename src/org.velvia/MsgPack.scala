@@ -22,9 +22,10 @@ class InvalidMsgPackDataException(msg: String) extends Exception(msg)
  * - Number
  *     byte, short, int, and long will be packed and unpacked into the smallest possible representation,
  *     BigInt's will be used for anything larger than long.MAX_VALUE
- * - String (UTF-8), byte[], or ByteBuffer (the *whole* buffer) (always unpacked as a byte[] unless you ask for something else)
+ * - String (UTF-8), Array[Byte], or ByteBuffer (the *whole* buffer) (defaults to unpacked as a String)
  * - Map (any Map may be used for packing, always unpacked as a HashMap)
  * - Seq (any Seq may be used for packing, always unpacked as a Vector)
+ * - Arrays (always unpacked as a Vector)
  * Passing any other types will throw an IllegalArumentException.
  *
  * @author velvia
