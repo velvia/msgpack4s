@@ -105,7 +105,11 @@ trait PackingUtils {
     if (size < 0)
       throw new InvalidMsgPackDataException("Map to unpack too large for Java (more than 2^31 elements)!")
     var map = collection.immutable.HashMap.empty[Any, Any]
-    (0 until size).foreach { n => map = map + (unpack(in, options) -> unpack(in, options)) }
+    var i = 0
+    while (i < size) {
+      map = map.updated(unpack(in, options), unpack(in, options))
+      i += 1
+    }
     map
   }
 
