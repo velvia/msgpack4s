@@ -156,7 +156,7 @@ object MsgPack extends PackingUtils {
    * @throws IOException if the underlying stream has an error
    * @throws InvalidMsgPackDataException If the given data cannot be unpacked.
    */
-  def unpack(in: DataInputStream, options: Int = UNPACK_RAW_AS_STRING): Any = {
+  def unpack(in: DataInputStream, options: Int): Any = {
     val value = in.read()
     if (value < 0) throw new InvalidMsgPackDataException("No more input available when expecting a value")
 
