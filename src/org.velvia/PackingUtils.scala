@@ -127,13 +127,13 @@ trait PackingUtils {
   protected def unpackMap(size: Int, in: DataInputStream, options: Int): Map[_, _] = {
     if (size < 0)
       throw new InvalidMsgPackDataException("Map to unpack too large for Java (more than 2^31 elements)!")
-    val map = collection.immutable.HashMap.newBuilder[Any, Any]
+    var map = collection.immutable.HashMap.empty[Any, Any]
     var i = 0
     while (i < size) {
-      map += unpack(in, options) -> unpack(in, options)
+      map = map.updated(unpack(in, options), unpack(in, options))
       i += 1
     }
-    map.result
+    map
   }
 
   protected def unpackRaw(size: Int, in: DataInputStream, options: Int): Any = {
