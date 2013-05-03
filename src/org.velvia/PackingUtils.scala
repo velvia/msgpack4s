@@ -18,53 +18,53 @@ trait PackingUtils {
   protected val MAX_32BIT = 0xffffffffL
 
   //these values are from http://wiki.msgpack.org/display/MSGPACK/Format+specification
-  protected val MP_NULL = 0xc0.toByte;
-  protected val MP_FALSE = 0xc2.toByte;
-  protected val MP_TRUE = 0xc3.toByte;
+  protected val MP_NULL = 0xc0.toByte
+  protected val MP_FALSE = 0xc2.toByte
+  protected val MP_TRUE = 0xc3.toByte
 
-  protected val MP_FLOAT = 0xca.toByte;
-  protected val MP_DOUBLE = 0xcb.toByte;
+  protected val MP_FLOAT = 0xca.toByte
+  protected val MP_DOUBLE = 0xcb.toByte
 
-  protected val MP_FIXNUM = 0x00.toByte;//last 7 bits is value
-  protected val MP_UINT8 = 0xcc.toByte;
-  protected val MP_UINT16 = 0xcd.toByte;
-  protected val MP_UINT32 = 0xce.toByte;
-  protected val MP_UINT64 = 0xcf.toByte;
+  protected val MP_FIXNUM = 0x00.toByte //last 7 bits is value
+  protected val MP_UINT8 = 0xcc.toByte
+  protected val MP_UINT16 = 0xcd.toByte
+  protected val MP_UINT32 = 0xce.toByte
+  protected val MP_UINT64 = 0xcf.toByte
 
-  protected val MP_NEGATIVE_FIXNUM = 0xe0.toByte;//last 5 bits is value
-  protected val MP_NEGATIVE_FIXNUM_INT = 0xe0;//  /me wishes for signed numbers.
-  protected val MP_INT8 = 0xd0.toByte;
-  protected val MP_INT16 = 0xd1.toByte;
-  protected val MP_INT32 = 0xd2.toByte;
-  protected val MP_INT64 = 0xd3.toByte;
+  protected val MP_NEGATIVE_FIXNUM = 0xe0.toByte //last 5 bits is value
+  protected val MP_NEGATIVE_FIXNUM_INT = 0xe0 // /me wishes for signed numbers.
+  protected val MP_INT8 = 0xd0.toByte
+  protected val MP_INT16 = 0xd1.toByte
+  protected val MP_INT32 = 0xd2.toByte
+  protected val MP_INT64 = 0xd3.toByte
 
-  protected val MP_FIXARRAY = 0x90.toByte;//last 4 bits is size
-  protected val MP_FIXARRAY_INT = 0x90;
-  protected val MP_ARRAY16 = 0xdc.toByte;
-  protected val MP_ARRAY32 = 0xdd.toByte;
+  protected val MP_FIXARRAY = 0x90.toByte //last 4 bits is size
+  protected val MP_FIXARRAY_INT = 0x90
+  protected val MP_ARRAY16 = 0xdc.toByte
+  protected val MP_ARRAY32 = 0xdd.toByte
 
-  protected val MP_FIXMAP = 0x80.toByte;//last 4 bits is size
-  protected val MP_FIXMAP_INT = 0x80;
-  protected val MP_MAP16 = 0xde.toByte;
-  protected val MP_MAP32 = 0xdf.toByte;
+  protected val MP_FIXMAP = 0x80.toByte //last 4 bits is size
+  protected val MP_FIXMAP_INT = 0x80
+  protected val MP_MAP16 = 0xde.toByte
+  protected val MP_MAP32 = 0xdf.toByte
 
-  protected val MP_FIXRAW = 0xa0.toByte;//last 5 bits is size
-  protected val MP_FIXRAW_INT = 0xa0;
-  protected val MP_RAW16 = 0xda.toByte;
-  protected val MP_RAW32 = 0xdb.toByte;
+  protected val MP_FIXRAW = 0xa0.toByte //last 5 bits is size
+  protected val MP_FIXRAW_INT = 0xa0
+  protected val MP_RAW16 = 0xda.toByte
+  protected val MP_RAW32 = 0xdb.toByte
 
   def pack(item: Any, out: DataOutputStream)
   def unpack(in: DataInputStream, options: Int): Any
 
   protected def packMap(map: collection.Map[Any, Any], out: DataOutputStream) {
     if (map.size <= MAX_4BIT) {
-      out.write(map.size | MP_FIXMAP);
+      out.write(map.size | MP_FIXMAP)
     } else if (map.size <= MAX_16BIT) {
-      out.write(MP_MAP16);
-      out.writeShort(map.size);
+      out.write(MP_MAP16)
+      out.writeShort(map.size)
     } else {
-      out.write(MP_MAP32);
-      out.writeInt(map.size);
+      out.write(MP_MAP32)
+      out.writeInt(map.size)
     }
     map foreach { case (k, v) => pack(k, out); pack(v, out) }
   }
@@ -115,25 +115,25 @@ trait PackingUtils {
   protected def unpackSeq(size: Int, in: DataInputStream, options: Int): Seq[_] = {
     if (size < 0)
       throw new InvalidMsgPackDataException("Array to unpack too large for Java (more than 2^31 elements)!")
-    var vec = Vector.empty[Any]
+    val vec = Vector.newBuilder[Any]
     var i = 0
     while (i < size) {
-      vec = vec :+ unpack(in, options)
+      vec += unpack(in, options)
       i += 1
     }
-    vec
+    vec.result
   }
 
   protected def unpackMap(size: Int, in: DataInputStream, options: Int): Map[_, _] = {
     if (size < 0)
       throw new InvalidMsgPackDataException("Map to unpack too large for Java (more than 2^31 elements)!")
-    var map = collection.immutable.HashMap.empty[Any, Any]
+    val map = collection.immutable.HashMap.newBuilder[Any, Any]
     var i = 0
     while (i < size) {
-      map = map.updated(unpack(in, options), unpack(in, options))
+      map += unpack(in, options) -> unpack(in, options)
       i += 1
     }
-    map
+    map.result
   }
 
   protected def unpackRaw(size: Int, in: DataInputStream, options: Int): Any = {
