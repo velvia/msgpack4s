@@ -33,7 +33,18 @@ class MsgPackUtilsSpec extends FunSpec with ShouldMatchers {
       deserialzied(2) should equal ("mobile")
     }
 
-    // Don't need test multiple types as Array[Byte] can't support.
+    it("should deserialize maps and be able to access fields conveniently") {
+      import MsgPackUtils._
+
+      val map = Map("int" -> 1, "str" -> "Kelvin")
+      val map1 = unpackMap(MsgPack.pack(map))
+
+      map1 should equal (map)
+      (map1.asInt("int") + 1) should equal (2)
+      (map1.asLong("int") + 2) should equal (3L)
+      map1.asOpt[Int]("doo") should equal (None)
+      map1.as[String]("str") should equal ("Kelvin")
+    }
   }
 
   describe("Test MsgPackUtils DataInputStream methods") {
