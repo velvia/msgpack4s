@@ -28,6 +28,16 @@ were written with multiple `pack()` calls.  For example:
     val item2: Int = MsgPack.unpack(inStream, 0)
     val item3: Long = MsgPack.unpack(inStream, 0)
 
+Convenience Functions
+=====================
+
+MsgPackUtils has convenience functions so you can pull out the right types from `unpack` without needing
+verbose `isInstanceOf[..]`.  They are especially useful when working with numbers.  For example:
+
+    import org.velvia.MsgPackUtils._
+    val map = unpackMap(bytes)
+    println("My number = " + map.asInt("number") + 99)
+
 Building, testing, packaging
 ============================
 
