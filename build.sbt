@@ -2,7 +2,7 @@ name := "msgpack4s"
 
 // Remove -SNAPSHOT from the version before publishing a release. Don't forget to change the version to
 // $(NEXT_VERSION)-SNAPSHOT afterwards!
-version := "0.4"
+version := "0.5-SNAPSHOT"
 
 organization := "org.velvia"
 
