@@ -90,4 +90,23 @@ class MsgPackUtilsSpec extends FunSpec with ShouldMatchers {
     }
   }
 
+  describe("Map as* implicit functions") {
+    import MsgPackUtils._
+
+    it("should read back ints") {
+      val map = Map("Kelvin" -> 9.toByte, "Evan" -> 1000, "along" -> 1234L, "str" -> "foo")
+      map.asInt("Kelvin") should equal (9)
+      map.asInt("Evan") should equal (1000)
+      intercept[ClassCastException] { map.asInt("along") }
+      intercept[ClassCastException] { map.asInt("str") }
+    }
+
+    it("should read back longs") {
+      val map = Map("Kelvin" -> 9.toByte, "Evan" -> 1000, "along" -> 1234L, "str" -> "foo")
+      map.asLong("Kelvin") should equal (9L)
+      map.asLong("Evan") should equal (1000L)
+      map.asLong("along") should equal (1234L)
+      intercept[ClassCastException] { map.asInt("str") }
+    }
+  }
 }
