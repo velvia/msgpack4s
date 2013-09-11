@@ -44,16 +44,18 @@ object MsgPackUtils {
   /**
    * Implicit conversions so we can access elements of the map through below extension methods
    */
-  implicit def toMapWrapper[K](map: collection.immutable.Map[K, Any]) = new MsgPackMapWrapper(map)
+  implicit def toMapWrapper[K](map: collection.Map[K, Any]) = new MsgPackMapWrapper(map)
 }
 
 /**
  * A wrapper around maps to provide convenient extension methods
  */
-class MsgPackMapWrapper[K](map: collection.immutable.Map[K, Any]) {
+class MsgPackMapWrapper[K](map: collection.Map[K, Any]) {
   def as[T](key: K): T = map(key).asInstanceOf[T]
 
   def asOpt[T](key: K): Option[T] = map.get(key).asInstanceOf[Option[T]]
+
+  def asMap(key: K): Map[K, Any] = map(key).asInstanceOf[Map[K, Any]]
 
   def asInt(key: K): Int = MsgPackUtils.getInt(map(key))
 

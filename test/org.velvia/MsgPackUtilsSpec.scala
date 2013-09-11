@@ -108,5 +108,12 @@ class MsgPackUtilsSpec extends FunSpec with ShouldMatchers {
       map.asLong("along") should equal (1234L)
       intercept[ClassCastException] { map.asInt("str") }
     }
+
+    it("should read back maps and options from mutable maps") {
+      val map = new collection.mutable.HashMap[String, Any]
+      map ++= Map("map1" -> Map("option" -> 5))
+      map.asMap("map1").asOpt[Int]("option").get should equal (5)
+      map.asMap("map1").asOpt[Int]("no-key") should equal (None)
+    }
   }
 }
