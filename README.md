@@ -17,16 +17,18 @@ Streaming mode
 There is a streaming API available as well.  This may be useful for cases where you need to unpack bytes that
 were written with multiple `pack()` calls.  For example:
 
-    val outStream = new DataOutputStream(...)
-    MsgPack.pack(item1, outStream)
-    MsgPack.pack(item2, outStream)
-    MsgPack.pack(item3, outStream)
+```scala
+val outStream = new DataOutputStream(...)
+MsgPack.pack(item1, outStream)
+MsgPack.pack(item2, outStream)
+MsgPack.pack(item3, outStream)
 
-    ....
+....
 
-    val item1: String = MsgPack.unpack(inStream, UNPACK_RAW_AS_STRING)
-    val item2: Int = MsgPack.unpack(inStream, 0)
-    val item3: Long = MsgPack.unpack(inStream, 0)
+val item1: String = MsgPack.unpack(inStream, UNPACK_RAW_AS_STRING)
+val item2: Int = MsgPack.unpack(inStream, 0)
+val item3: Long = MsgPack.unpack(inStream, 0)
+```
 
 Convenience Functions
 =====================
@@ -34,9 +36,11 @@ Convenience Functions
 MsgPackUtils has convenience functions so you can pull out the right types from `unpack` without needing
 verbose `isInstanceOf[..]`.  They are especially useful when working with numbers.  For example:
 
-    import org.velvia.MsgPackUtils._
-    val map = unpackMap(bytes)
-    println("My number = " + map.asInt("number") + 99)
+```scala
+import org.velvia.MsgPackUtils._
+val map = unpackMap(bytes)
+println("My number = " + map.asInt("number") + 99)
+```
 
 Building, testing, packaging
 ============================
