@@ -11,6 +11,17 @@ A super-simple MessagePack serialization library for Scala, based on [msgpack-ja
 
 For the exact semantics of packing and unpacking, see the ScalaDoc.
 
+Using this library
+==================
+
+Include this in `build.sbt`:
+
+```scala
+repositories += "velvia maven" at "http://dl.bintray.com/velvia/maven"
+
+libraryDependencies += "org.velvia" %% "msgpack4s" % "0.4.2"
+```
+
 Streaming mode
 ==============
 
@@ -48,19 +59,3 @@ Building, testing, packaging
     sbt test
     sbt "+ package"
     sbt "+ make-pom"
-
-You can add information to build.sbt to enable publishing to your own Nexus repo, like this:
-
-    publishMavenStyle := true
-
-    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-
-    publishTo <<= (version) { version: String =>
-        val nexus = "http://nexus.mycompany.com/nexus/content/repositories/"
-        if (version.trim.endsWith("SNAPSHOT")) Some("snapshots" at nexus + "snapshots/")
-        else                                   Some("releases" at nexus + "releases/")
-    }
-
-Then simple issue
-
-    sbt "+ publish"
