@@ -17,7 +17,7 @@ Using this library
 Include this in `build.sbt`:
 
 ```scala
-repositories += "velvia maven" at "http://dl.bintray.com/velvia/maven"
+resolvers += "velvia maven" at "http://dl.bintray.com/velvia/maven"
 
 libraryDependencies += "org.velvia" %% "msgpack4s" % "0.4.2"
 ```
