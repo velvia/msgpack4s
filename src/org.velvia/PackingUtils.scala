@@ -141,7 +141,8 @@ trait PackingUtils {
       throw new InvalidMsgPackDataException("byte[] to unpack too large for Java (more than 2^31 elements)!")
 
     val data = new Array[Byte](size)
-    in.read(data)
+    // Don't use the standard read() method, it's not guaranteed to read back all the bytes!
+    in.readFully(data)
 
     if ((options & UNPACK_RAW_AS_BYTE_BUFFER) != 0) {
       ByteBuffer.wrap(data)
