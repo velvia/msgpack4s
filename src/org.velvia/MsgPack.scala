@@ -162,7 +162,6 @@ object MsgPack extends PackingUtils {
     if (value < 0) throw new InvalidMsgPackDataException("No more input available when expecting a value")
 
     try {
-      var size = 0
       // Ordering of statements has a large effect on unpacking time
       // The current ordering is optimized for short maps, lists, strings, and small numbers
       value.toByte match {
