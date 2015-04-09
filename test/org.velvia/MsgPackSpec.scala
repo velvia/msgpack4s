@@ -2,9 +2,9 @@ package org.velvia
 
 import util.Random
 import org.scalatest.FunSpec
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 
-class MsgPackSpec extends FunSpec with ShouldMatchers {
+class MsgPackSpec extends FunSpec with Matchers {
   describe("MsgPack pack and unpack") {
     it("should serialize and deserialize integers") {
       val numbers = Seq(0, 2, -3, 31, 32, 33, -32, -33, 127, 128, 129, -127, -128, -129,
@@ -37,7 +37,7 @@ class MsgPackSpec extends FunSpec with ShouldMatchers {
     it("should serialize and deserialize Bools, null") {
       MsgPack.unpack(MsgPack.pack(true)) should equal (true)
       MsgPack.unpack(MsgPack.pack(false)) should equal (false)
-      MsgPack.unpack(MsgPack.pack(null)) should equal (null)
+      MsgPack.unpack(MsgPack.pack(null)) should equal (null.asInstanceOf[AnyRef])
     }
 
     it("should serialize and deserialize sequences") {

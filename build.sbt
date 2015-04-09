@@ -10,14 +10,14 @@ organization := "org.velvia"
 
 scalaVersion := "2.10.4"
 
-crossScalaVersions := Seq("2.9.2", "2.10.4")
+crossScalaVersions := Seq("2.10.4", "2.11.5")
 
 unmanagedSourceDirectories in Compile <++= Seq(baseDirectory(_ / "src" )).join
 
 unmanagedSourceDirectories in Test <++= Seq(baseDirectory(_ / "test" )).join
 
 // Testing deps
-libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "1.9.1" % "test",
+libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "2.2.0" % "test",
                             "org.mockito" % "mockito-all" % "1.9.0" % "test")
 
 Seq(bintrayPublishSettings: _*)
