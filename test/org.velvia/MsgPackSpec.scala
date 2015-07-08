@@ -31,7 +31,7 @@ class MsgPackSpec extends FunSpec with Matchers {
     }
 
     it("should serialize and deserialize strings") {
-      MsgPack.unpack(MsgPack.pack("abcDEF"), MsgPack.UNPACK_RAW_AS_STRING) should equal ("abcDEF")
+      MsgPack.unpack(MsgPack.pack("abcDEF")) should equal ("abcDEF")
     }
 
     it("should serialize and deserialize Bools, null") {
@@ -70,7 +70,7 @@ class MsgPackSpec extends FunSpec with Matchers {
 
     it("should serialize and deserialize Maps") {
       val map = Map("type" -> 9, "owner" -> "ev", "stats" -> Map(29 -> 1, "those" -> Seq(1, 2)))
-      val unpacked = MsgPack.unpack(MsgPack.pack(map), MsgPack.UNPACK_RAW_AS_STRING).asInstanceOf[Map[_, _]]
+      val unpacked = MsgPack.unpack(MsgPack.pack(map)).asInstanceOf[Map[_, _]]
       unpacked should equal (map)
     }
   }

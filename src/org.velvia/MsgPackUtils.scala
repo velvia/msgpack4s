@@ -6,7 +6,7 @@ import java.io.DataInputStream
  * Some convenient methods for unpacking things
  */
 object MsgPackUtils {
-  def unpack(dis: DataInputStream): Any = MsgPack.unpack(dis, MsgPack.DEFAULT_OPTIONS)
+  import MsgPack.unpack
 
   def getInt(item: Any): Int = item match {
     case i: Int   => i
@@ -25,13 +25,13 @@ object MsgPackUtils {
       + " to a Long")
   }
 
-  def unpackInt(rawData: Array[Byte]): Int = getInt(MsgPack.unpack(rawData))
+  def unpackInt(rawData: Array[Byte]): Int = getInt(unpack(rawData))
 
-  def unpackLong(rawData: Array[Byte]): Long = getLong(MsgPack.unpack(rawData))
+  def unpackLong(rawData: Array[Byte]): Long = getLong(unpack(rawData))
 
-  def unpackSeq(rawData: Array[Byte]): Seq[Any] = MsgPack.unpack(rawData).asInstanceOf[Seq[Any]]
+  def unpackSeq(rawData: Array[Byte]): Seq[Any] = unpack(rawData).asInstanceOf[Seq[Any]]
 
-  def unpackMap(rawData: Array[Byte]): Map[Any, Any] = MsgPack.unpack(rawData).asInstanceOf[Map[Any, Any]]
+  def unpackMap(rawData: Array[Byte]): Map[Any, Any] = unpack(rawData).asInstanceOf[Map[Any, Any]]
 
   def unpackInt(dis: DataInputStream): Int = getInt(unpack(dis))
 

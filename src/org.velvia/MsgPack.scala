@@ -53,25 +53,17 @@ object MsgPack extends PackingUtils {
     out.toByteArray();
   }
 
-  val DEFAULT_OPTIONS = UNPACK_RAW_AS_STRING
-
   /**
    * Unpacks the given data.
    *
-   * @param packed data
-   * @param int options, defaults to DEFAULT_OPTIONS
-   * Bitmask of flags to specify how to map certain values back to java types:
-   * For raw types:
-   *    (no option) - All raw bytes are decoded as a byte[]
-   *    OPTION_RAW_AS_STRING - All raw bytes are decoded as a UTF-8 string, with invalid codepoints replaced with a placeholder
-   *    OPTION_RAW_AS_BYTE_BUFFER - All raw bytes are decoded as ByteBuffers (with a backing array)
+   * @param data the byte array to unpack
    * @return the unpacked data
    * @throws InvalidMsgPackDataException If the given data cannot be unpacked.
    */
-  def unpack(data: Array[Byte], options: Int = DEFAULT_OPTIONS): Any = {
+  def unpack(data: Array[Byte]): Any = {
     val in = new ByteArrayInputStream(data)
     try {
-      unpack(new DataInputStream(in), options)
+      unpack(new DataInputStream(in))
     } catch {
       case ex: InvalidMsgPackDataException =>  throw ex
       case ex: IOException =>            //this shouldn't happen
@@ -88,8 +80,8 @@ object MsgPack extends PackingUtils {
    */
   def pack(item: Any, out: DataOutputStream) {
     item match {
-      case x: String =>      writeRawBytes(x.getBytes("UTF-8"), out)
-      case n: Number  =>  n.asInstanceOf[Any] match {
+      case s: String => packString(s, out)
+      case n: Number => n.asInstanceOf[Any] match {
           case f: Float =>  out.write(MP_FLOAT); out.writeFloat(f)
           case d: Double => out.write(MP_DOUBLE); out.writeDouble(d)
           case _ =>
@@ -130,16 +122,16 @@ object MsgPack extends PackingUtils {
         }
       case map: collection.Map[Any, Any] => packMap(map, out)
       case s: Seq[_]      => packSeq(s, out)
-      case b: Array[Byte] => writeRawBytes(b, out)
+      case b: Array[Byte] => packRawBytes(b, out)
       case a: Array[_]    => packArray(a, out)
       case bb: ByteBuffer =>
         if (bb.hasArray())
-          writeRawBytes(bb.array, out)
+          packRawBytes(bb.array, out)
         else {
           val data = new Array[Byte](bb.capacity())
           bb.position(); bb.limit(bb.capacity())
           bb.get(data)
-          writeRawBytes(data, out)
+          packRawBytes(data, out)
         }
       case x: Boolean =>  out.write(if (x) MP_TRUE else MP_FALSE)
       case null       =>  out.write(MP_NULL)
@@ -150,15 +142,19 @@ object MsgPack extends PackingUtils {
 
   /**
    * Unpacks the item, streaming the data from the given OutputStream.
-   * Warning: this does not do any recursion checks. If you pass a cyclic object,
-   * you will run in an infinite loop until you run out of memory/space to write.
    * @param in Input stream to read from
-   * @param options Bitmask of options, @see unpack(byte[] data, int options)
+   * @param compatibilityMode True for compatibility mode
+   *          MessagePack format used to pack raw bytes and strings with the same message format
+   *          header (0xda/b, 0xa0-0xbf). If you want compatibility with old MessagePack messages,
+   *          setting this to True will return all String formatted messages as raw bytes instead.
+   *          The old UNPACK_RAW_AS_STRING option becomes the default behavior now since the old
+   *          RAW format is now the STRING format.
    * @throws IOException if the underlying stream has an error
    * @throws InvalidMsgPackDataException If the given data cannot be unpacked.
    */
-  def unpack(in: DataInputStream, options: Int): Any = {
+  def unpack(in: DataInputStream, compatibilityMode: Boolean = false): Any = {
     val value = in.read()
+    val compatModeOption = if (compatibilityMode) 0 else UNPACK_RAW_AS_STRING
     if (value < 0) throw new InvalidMsgPackDataException("No more input available when expecting a value")
 
     try {
@@ -166,12 +162,14 @@ object MsgPack extends PackingUtils {
       // The current ordering is optimized for short maps, lists, strings, and small numbers
       value.toByte match {
         case b if b >= MP_NEGATIVE_FIXNUM => value.toByte     // All numbers between -32 and +127
-        case b if (b >= MP_FIXRAW && b <= MP_FIXRAW + MAX_5BIT) =>
-          unpackRaw(value - MP_FIXRAW_INT, in, options)
+        case b if (b >= MP_FIXSTR && b <= MP_FIXSTR + MAX_5BIT) =>
+          unpackRaw(value - MP_FIXSTR_INT, in, compatModeOption)
         case b if (b >= MP_FIXARRAY && b <= MP_FIXARRAY + MAX_4BIT) =>
-          unpackSeq(value - MP_FIXARRAY_INT, in, options)
+          unpackSeq(value - MP_FIXARRAY_INT, in, compatibilityMode)
         case b if (b >= MP_FIXMAP && b <= MP_FIXMAP + MAX_4BIT) =>
-          unpackMap(value - MP_FIXMAP_INT, in, options)
+          unpackMap(value - MP_FIXMAP_INT, in, compatibilityMode)
+        // Compatibility mode not needed for STR8, which did not previously exist
+        case MP_STR8  => unpackRaw(in.read(), in, UNPACK_RAW_AS_STRING)
         case MP_UINT16 => in.readShort() & MAX_16BIT //read short, trick Java into treating it as unsigned, return int
         case MP_UINT32 => in.readInt() & MAX_32BIT //read int, trick Java into treating it as unsigned, return long
         case MP_INT16 => in.readShort()
@@ -187,12 +185,15 @@ object MsgPack extends PackingUtils {
         case MP_UINT8 =>  in.read()       //read single byte, return as int
         case MP_INT8 =>  in.read().toByte
         case MP_INT64 => in.readLong()
-        case MP_ARRAY16 => unpackSeq(in.readShort() & MAX_16BIT, in, options)
-        case MP_ARRAY32 => unpackSeq(in.readInt(), in, options);
-        case MP_MAP16 => unpackMap(in.readShort() & MAX_16BIT, in, options)
-        case MP_MAP32 => unpackMap(in.readInt(), in, options);
-        case MP_RAW16 => unpackRaw(in.readShort() & MAX_16BIT, in, options)
-        case MP_RAW32 => unpackRaw(in.readInt(), in, options)
+        case MP_STR16 => unpackRaw(in.readShort() & MAX_16BIT, in, compatModeOption)
+        case MP_STR32 => unpackRaw(in.readInt(), in, compatModeOption)
+        case MP_ARRAY16 => unpackSeq(in.readShort() & MAX_16BIT, in, compatibilityMode)
+        case MP_ARRAY32 => unpackSeq(in.readInt(), in, compatibilityMode);
+        case MP_MAP16 => unpackMap(in.readShort() & MAX_16BIT, in, compatibilityMode)
+        case MP_MAP32 => unpackMap(in.readInt(), in, compatibilityMode);
+        case MP_RAW8  => unpackRaw(in.read(), in, 0)
+        case MP_RAW16 => unpackRaw(in.readShort() & MAX_16BIT, in, 0)
+        case MP_RAW32 => unpackRaw(in.readInt(), in, 0)
         case MP_FALSE =>  false
         case MP_TRUE =>   true
         case MP_FLOAT =>  in.readFloat()
