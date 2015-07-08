@@ -3,7 +3,7 @@ msgpack4s
 
 A super-simple MessagePack serialization library for Scala, based on [msgpack-java-lite](https://bitbucket.org/sirbrialliance/msgpack-java-lite/overview)
 
-* Simple API: `MsgPack.pack(object)` and `MsgPack.unpack(stream)`.
+* Simple API
 * Directly unpacks maps, sequences, and any non-cyclic nested sequences/maps to Scala immutable collections
 * Can unpack `Map[Any, Any]` or `Map[String, Any]` without extra code, unlike msgpack-scala
 * No extra dependencies.  No need to build a separate Java library.
@@ -23,6 +23,22 @@ libraryDependencies += "org.velvia" %% "msgpack4s" % "0.4.3"
 ```
 
 Currently cross-compiled for Scala 2.10 and 2.11.
+
+You will probably want to use the type-safe API that uses TypeClasses:
+
+```scala
+import org.velvia.msgpack._
+import org.velvia.msgpack.SimpleCodecs._
+
+unpack[Int](pack(123))
+```
+
+There are also the older APIs that work with Any, but are not type safe:
+
+```scala
+import org.velvia.MsgPack
+MsgPack.unpack(MsgPack.pack(Map("key" -> 3)))
+```
 
 Streaming mode
 ==============

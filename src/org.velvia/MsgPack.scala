@@ -44,9 +44,9 @@ object MsgPack extends PackingUtils {
    * @throws UnpackableItemException If the given data cannot be packed.
    */
   def pack(item: Any): Array[Byte] = {
-    val out = new ByteArrayOutputStream();
+    val out = new ByteArrayOutputStream()
     try {
-      pack(item, new DataOutputStream(out));
+      pack(item, new DataOutputStream(out))
     } catch {
       case e: IOException =>
         //this shouldn't happen
