@@ -31,6 +31,8 @@ class InvalidMsgPackDataException(msg: String) extends Exception(msg)
  * @author velvia
  */
 object MsgPack extends PackingUtils {
+  import org.velvia.msgpack.Format._
+
   /**
    * Packs an item using the msgpack protocol.
    *
@@ -82,43 +84,9 @@ object MsgPack extends PackingUtils {
     item match {
       case s: String => packString(s, out)
       case n: Number => n.asInstanceOf[Any] match {
-          case f: Float =>  out.write(MP_FLOAT); out.writeFloat(f)
+          case f: Float  =>  out.write(MP_FLOAT); out.writeFloat(f)
           case d: Double => out.write(MP_DOUBLE); out.writeDouble(d)
-          case _ =>
-            val value = n.longValue
-            if (value >= 0) {
-              if (value <= MAX_7BIT) {
-                out.write(value.toInt | MP_FIXNUM)
-              } else if (value <= MAX_8BIT) {
-                out.write(MP_UINT8)
-                out.write(value.toInt)
-              } else if (value <= MAX_16BIT) {
-                out.write(MP_UINT16);
-                out.writeShort(value.toInt)
-              } else if (value <= MAX_32BIT) {
-                out.write(MP_UINT32)
-                out.writeInt(value.toInt)
-              } else {
-                out.write(MP_UINT64)
-                out.writeLong(value)
-              }
-            } else {
-              if (value >= -(MAX_5BIT + 1)) {
-                out.write((value & 0xff).toInt)
-              } else if (value >= -(MAX_7BIT + 1)) {
-                out.write(MP_INT8)
-                out.write(value.toInt)
-              } else if (value >= -(MAX_15BIT + 1)) {
-                out.write(MP_INT16)
-                out.writeShort(value.toInt)
-              } else if (value >= -(MAX_31BIT + 1)) {
-                out.write(MP_INT32)
-                out.writeInt(value.toInt)
-              } else {
-                out.write(MP_INT64)
-                out.writeLong(value)
-              }
-            }
+          case _         => packLong(n.longValue, out)
         }
       case map: collection.Map[Any, Any] => packMap(map, out)
       case s: Seq[_]      => packSeq(s, out)
