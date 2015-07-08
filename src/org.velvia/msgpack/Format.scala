@@ -147,4 +147,10 @@ object Format {
       new String(data, "UTF-8")
     } else data
   }
+
+  def unpackString(size: Int, in: DataInputStream): String =
+    unpackRaw(size, in, UNPACK_RAW_AS_STRING).asInstanceOf[String]
+
+  def unpackByteArray(size: Int, in: DataInputStream): Array[Byte] =
+    unpackRaw(size, in, 0).asInstanceOf[Array[Byte]]
 }

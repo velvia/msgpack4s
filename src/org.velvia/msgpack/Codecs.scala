@@ -45,10 +45,10 @@ object SimpleCodecs {
     )
   }
 
-  val byteFuncMap: Map[Byte, DIS => Byte] = Range(MP_NEGATIVE_FIXNUM, Byte.MaxValue).map { i =>
-    val b = i.toByte
-    b -> { dis: DIS => b }
-  }.toMap
+  val byteFuncMap: Map[Byte, DIS => Byte] =
+    (MP_NEGATIVE_FIXNUM.toInt to Byte.MaxValue).map(_.toByte).map { b =>
+      b -> { dis: DIS => b }
+    }.toMap
 
   implicit object ByteCodec extends Codec[Byte] {
     def pack(out: DataOutputStream, item: Byte) { packLong(item.toLong, out) }
@@ -92,5 +92,55 @@ object SimpleCodecs {
       MP_UINT8  -> { in: DIS => in.read().toLong },
       MP_INT8   -> { in: DIS => in.read().toLong }
     ) ++ byteFuncMap.mapValues(_.andThen(_.toLong))
+  }
+
+  implicit object FloatCodec extends Codec[Float] {
+    def pack(out: DataOutputStream, item: Float) {
+      out.write(MP_FLOAT)
+      out.writeFloat(item)
+    }
+
+    val unpackFuncMap = Map[Byte, UnpackFunc](
+      MP_FLOAT -> { in: DIS => in.readFloat() }
+    )
+  }
+
+  implicit object DoubleCodec extends Codec[Double] {
+    def pack(out: DataOutputStream, item: Double) {
+      out.write(MP_DOUBLE)
+      out.writeDouble(item)
+    }
+
+    val unpackFuncMap = Map[Byte, UnpackFunc](
+      MP_DOUBLE -> { in: DIS => in.readDouble() }
+    )
+  }
+}
+
+/**
+ * Codecs for newer MessagePack strings and raw bytes.
+ * These codecs can also be used for older MessagePack messages if you did not encode raw byte values.
+ */
+object RawStringCodecs {
+  import Format._
+
+  implicit object StringCodec extends Codec[String] {
+    def pack(out: DataOutputStream, item: String) { packString(item, out) }
+    val unpackFuncMap = Map[Byte, UnpackFunc](
+        MP_STR8  -> { in: DIS => unpackString(in.read(), in) },
+        MP_STR16 -> { in: DIS => unpackString(in.readShort() & MAX_16BIT, in) },
+        MP_STR32 -> { in: DIS => unpackString(in.readInt(), in) }
+    ) ++ (0 to MAX_5BIT).map { strlen =>
+      (MP_FIXSTR | strlen).toByte -> { in: DIS => unpackString(strlen, in) }
+    }
+  }
+
+  implicit object ByteArrayCodec extends Codec[Array[Byte]] {
+    def pack(out: DataOutputStream, item: Array[Byte]) { packRawBytes(item, out) }
+    val unpackFuncMap = Map[Byte, UnpackFunc](
+        MP_RAW8  -> { in: DIS => unpackByteArray(in.read(), in) },
+        MP_RAW16 -> { in: DIS => unpackByteArray(in.readShort() & MAX_16BIT, in) },
+        MP_RAW32 -> { in: DIS => unpackByteArray(in.readInt(), in) }
+    )
   }
 }
