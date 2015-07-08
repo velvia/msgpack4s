@@ -3,7 +3,7 @@ msgpack4s
 
 A super-simple MessagePack serialization library for Scala, based on [msgpack-java-lite](https://bitbucket.org/sirbrialliance/msgpack-java-lite/overview)
 
-* Simple API: `MsgPack.pack(object)` and `MsgPack.unpack(byteArray)`.
+* Simple API: `MsgPack.pack(object)` and `MsgPack.unpack(stream)`.
 * Directly unpacks maps, sequences, and any non-cyclic nested sequences/maps to Scala immutable collections
 * Can unpack `Map[Any, Any]` or `Map[String, Any]` without extra code, unlike msgpack-scala
 * No extra dependencies.  No need to build a separate Java library.
@@ -38,9 +38,9 @@ MsgPack.pack(item3, outStream)
 
 ....
 
-val item1: String = MsgPack.unpack(inStream, UNPACK_RAW_AS_STRING)
-val item2: Int = MsgPack.unpack(inStream, 0)
-val item3: Long = MsgPack.unpack(inStream, 0)
+val item1: String = MsgPack.unpack(inStream)
+val item2: Int = MsgPack.unpack(inStream)
+val item3: Long = MsgPack.unpack(inStream)
 ```
 
 Convenience Functions
@@ -54,6 +54,20 @@ import org.velvia.MsgPackUtils._
 val map = unpackMap(bytes)
 println("My number = " + map.asInt("number") + 99)
 ```
+
+There are also functions `getInt` and `getLong` to conveniently get an Int or Long out, because MessagePack will pack them as [U]INT8/16/32/64's.
+
+Compatibility Mode
+==================
+The MessagePack format was upgraded to differentiate STRings vs RAWs.  So now 
+one no longer has to pass in an option to decide how to unpack strings vs raw bytes.
+OTOH the unpack interface has been changed to provide a compatibility mode:
+setting to true allows to parse STR formats as raw bytes, so that MessagePack messages
+sent using older encoders can be parsed as raw bytes if needed.
+
+To unpack older MessagePack messages as raw bytes instead of strings:
+
+   MsgPack.unpack(inStream, true)
 
 Building, testing, packaging
 ============================
