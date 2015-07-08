@@ -34,6 +34,11 @@ class MsgPackSpec extends FunSpec with Matchers {
       MsgPack.unpack(MsgPack.pack("abcDEF")) should equal ("abcDEF")
     }
 
+    it("should deserialize older MsgPack messages as raw bytes in compatibility mode") {
+      val bais = new java.io.ByteArrayInputStream(MsgPack.pack("abcDEF"))
+      MsgPack.unpack(new java.io.DataInputStream(bais), true) should equal ("abcDEF".getBytes("UTF-8"))
+    }
+
     it("should serialize and deserialize Bools, null") {
       MsgPack.unpack(MsgPack.pack(true)) should equal (true)
       MsgPack.unpack(MsgPack.pack(false)) should equal (false)
