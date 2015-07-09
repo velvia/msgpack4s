@@ -127,6 +127,35 @@ object Format {
     }
   }
 
+  def packSeq[T: Codec](s: Seq[T], out: DataOutputStream) {
+    val packer = implicitly[Codec[T]]
+    if (s.length <= MAX_4BIT) {
+      out.write(s.length | MP_FIXARRAY)
+    } else if (s.length <= MAX_16BIT) {
+      out.write(MP_ARRAY16)
+      out.writeShort(s.length)
+    } else {
+      out.write(MP_ARRAY32)
+      out.writeInt(s.length)
+    }
+    s foreach { packer.pack(out, _) }
+  }
+
+  def packMap[K: Codec, V: Codec](map: collection.Map[K, V], out: DataOutputStream) {
+    val keyCodec = implicitly[Codec[K]]
+    val valCodec = implicitly[Codec[V]]
+    if (map.size <= MAX_4BIT) {
+      out.write(map.size | MP_FIXMAP)
+    } else if (map.size <= MAX_16BIT) {
+      out.write(MP_MAP16)
+      out.writeShort(map.size)
+    } else {
+      out.write(MP_MAP32)
+      out.writeInt(map.size)
+    }
+    map foreach { case (k, v) => keyCodec.pack(out, k); valCodec.pack(out, v) }
+  }
+
   val UNPACK_RAW_AS_STRING = 0x1
   val UNPACK_RAW_AS_BYTE_BUFFER = 0x2
 
@@ -153,4 +182,29 @@ object Format {
 
   def unpackByteArray(size: Int, in: DataInputStream): Array[Byte] =
     unpackRaw(size, in, 0).asInstanceOf[Array[Byte]]
+
+  def unpackSeq[T: Codec](size: Int, in: DataInputStream): Seq[T] = {
+    val unpacker = implicitly[Codec[T]]
+    if (size < 0)
+      throw new InvalidMsgPackDataException("Array to unpack too large for Java (more than 2^31 elements)!")
+    val vec = Vector.newBuilder[T]
+    var i = 0
+    while (i < size) {
+      vec += unpacker.unpack(in)
+      i += 1
+    }
+    vec.result
+  }
+
+  def unpackMap[K: Codec, V: Codec](size: Int, in: DataInputStream): Map[K, V] = {
+    val keyCodec = implicitly[Codec[K]]
+    val valCodec = implicitly[Codec[V]]
+    if (size < 0)
+      throw new InvalidMsgPackDataException("Map to unpack too large for Java (more than 2^31 elements)!")
+    var map = Map.newBuilder[K, V]
+    for { i <- 0 until size } {
+      map += keyCodec.unpack(in) -> valCodec.unpack(in)
+    }
+    map.result
+  }
 }

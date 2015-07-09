@@ -30,4 +30,24 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
       unpack[String](pack(longerStr)) should equal (longerStr)
     }
   }
+
+  describe("collections packing and unpacking") {
+    import org.velvia.msgpack.CollectionCodecs._
+
+    val intSeqCodec = new SeqCodec[Int]
+    val strIntMapCodec = new MapCodec[String, Int]
+
+    it("should pack and unpack Seqs and Arrays") {
+      val seq1 = Seq(1, 2, 3, 4, 5)
+      unpack(pack(seq1)(intSeqCodec))(intSeqCodec) should equal (seq1)
+
+      val array = (-3 to 24).toArray   // Force to be longer than 16 values
+      unpack(pack(array.toSeq)(intSeqCodec))(intSeqCodec) should equal (array.toSeq)
+    }
+
+    it("should pack and unpack Maps") {
+      val map = Map("apples" -> 1, "bears" -> -5, "oranges" -> 100)
+      unpack(pack(map)(strIntMapCodec))(strIntMapCodec) should equal (map)
+    }
+  }
 }
