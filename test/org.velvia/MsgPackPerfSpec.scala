@@ -12,6 +12,14 @@ class MsgPackPerfSpec extends FunSpec with ShouldMatchers {
         "someList" -> List.fill(5)(Random.nextInt(16)))
   }
 
+  import org.velvia.msgpack.CollectionCodecs._
+  import org.velvia.msgpack.SimpleCodecs._
+  import org.velvia.msgpack.RawStringCodecs._
+  import org.velvia.msgpack.AnyCodecs._
+
+  implicit val anyCodec = new AnyCodec[String, Any](false)(StringCodec, DefaultAnyCodec)
+  implicit val mapCodec = new MapCodec[String, Any]
+
   def time(func: => Unit) {
     val startTime = System.nanoTime()
     var i = 0
@@ -23,12 +31,12 @@ class MsgPackPerfSpec extends FunSpec with ShouldMatchers {
   it("should pack pretty fast") {
     val map = genMap()
     println("Packing time:")
-    time(MsgPack.pack(map))
+    time(msgpack.pack(map))
   }
 
   it("should unpack pretty fast") {
     val bytes = MsgPack.pack(genMap())
     println("Unpacking time:")
-    time(MsgPack.unpack(bytes))
+    time(msgpack.unpack(bytes)(mapCodec))
   }
 }

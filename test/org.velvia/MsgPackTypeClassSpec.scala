@@ -17,6 +17,13 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
     it("should unpack and pack primitive numbers") {
       unpack[Int](pack(Int.MaxValue)) should equal (Int.MaxValue)
       unpack[Int](pack(-1)) should equal (-1)
+      unpack[Int](pack(-33)) should equal (-33)
+
+      unpack[Byte](pack(-34.toByte)) should equal (-34.toByte)
+      unpack[Short](pack(128.toShort)) should equal (128.toShort)
+
+      unpack[Long](pack(-35L)) should equal (-35L)
+      unpack[Long](pack(-1000L)) should equal (-1000L)
     }
 
     it("should unpack and pack floats and doubles") {

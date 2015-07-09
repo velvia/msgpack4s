@@ -6,7 +6,6 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.EOFException
 import java.io.IOException
-import java.nio.ByteBuffer
 
 
 class InvalidMsgPackDataException(msg: String) extends Exception(msg)
@@ -28,10 +27,13 @@ class InvalidMsgPackDataException(msg: String) extends Exception(msg)
  * - Arrays (always unpacked as a Vector)
  * Passing any other types will throw an IllegalArumentException.
  *
+ * NOTE:  This API is old.  Try the newer TypeClass-based API.
+ *
  * @author velvia
  */
-object MsgPack extends PackingUtils {
+object MsgPack {
   import org.velvia.msgpack.Format._
+  import org.velvia.msgpack.AnyCodecs._
 
   /**
    * Packs an item using the msgpack protocol.
@@ -81,31 +83,7 @@ object MsgPack extends PackingUtils {
    * @param out
    */
   def pack(item: Any, out: DataOutputStream) {
-    item match {
-      case s: String => packString(s, out)
-      case n: Number => n.asInstanceOf[Any] match {
-          case f: Float  =>  out.write(MP_FLOAT); out.writeFloat(f)
-          case d: Double => out.write(MP_DOUBLE); out.writeDouble(d)
-          case _         => packLong(n.longValue, out)
-        }
-      case map: collection.Map[Any, Any] => packMap(map, out)
-      case s: Seq[_]      => packSeq(s, out)
-      case b: Array[Byte] => packRawBytes(b, out)
-      case a: Array[_]    => packArray(a, out)
-      case bb: ByteBuffer =>
-        if (bb.hasArray())
-          packRawBytes(bb.array, out)
-        else {
-          val data = new Array[Byte](bb.capacity())
-          bb.position(); bb.limit(bb.capacity())
-          bb.get(data)
-          packRawBytes(data, out)
-        }
-      case x: Boolean =>  out.write(if (x) MP_TRUE else MP_FALSE)
-      case null       =>  out.write(MP_NULL)
-      case item =>
-        throw new IllegalArgumentException("Cannot msgpack object of type " + item.getClass().getCanonicalName());
-    }
+    DefaultAnyCodec.pack(out, item)
   }
 
   /**
@@ -121,59 +99,7 @@ object MsgPack extends PackingUtils {
    * @throws InvalidMsgPackDataException If the given data cannot be unpacked.
    */
   def unpack(in: DataInputStream, compatibilityMode: Boolean = false): Any = {
-    val value = in.read()
-    val compatModeOption = if (compatibilityMode) 0 else UNPACK_RAW_AS_STRING
-    if (value < 0) throw new InvalidMsgPackDataException("No more input available when expecting a value")
-
-    try {
-      // Ordering of statements has a large effect on unpacking time
-      // The current ordering is optimized for short maps, lists, strings, and small numbers
-      value.toByte match {
-        case b if b >= MP_NEGATIVE_FIXNUM => value.toByte     // All numbers between -32 and +127
-        case b if (b >= MP_FIXSTR && b <= MP_FIXSTR + MAX_5BIT) =>
-          unpackRaw(value - MP_FIXSTR_INT, in, compatModeOption)
-        case b if (b >= MP_FIXARRAY && b <= MP_FIXARRAY + MAX_4BIT) =>
-          unpackSeq(value - MP_FIXARRAY_INT, in, compatibilityMode)
-        case b if (b >= MP_FIXMAP && b <= MP_FIXMAP + MAX_4BIT) =>
-          unpackMap(value - MP_FIXMAP_INT, in, compatibilityMode)
-        // Compatibility mode not needed for STR8, which did not previously exist
-        case MP_STR8  => unpackRaw(in.read(), in, UNPACK_RAW_AS_STRING)
-        case MP_UINT16 => in.readShort() & MAX_16BIT //read short, trick Java into treating it as unsigned, return int
-        case MP_UINT32 => in.readInt() & MAX_32BIT //read int, trick Java into treating it as unsigned, return long
-        case MP_INT16 => in.readShort()
-        case MP_INT32 => in.readInt()
-        case MP_UINT64 =>
-          val v = in.readLong()
-          if (v >= 0) v
-          else
-            //this is a little bit more tricky, since we don't have unsigned longs
-            math.BigInt(1, Array[Byte](((v >> 24) & 0xff).toByte,
-                                       ((v >> 16) & 0xff).toByte,
-                                       ((v >> 8) & 0xff).toByte, (v & 0xff).toByte))
-        case MP_UINT8 =>  in.read()       //read single byte, return as int
-        case MP_INT8 =>  in.read().toByte
-        case MP_INT64 => in.readLong()
-        case MP_STR16 => unpackRaw(in.readShort() & MAX_16BIT, in, compatModeOption)
-        case MP_STR32 => unpackRaw(in.readInt(), in, compatModeOption)
-        case MP_ARRAY16 => unpackSeq(in.readShort() & MAX_16BIT, in, compatibilityMode)
-        case MP_ARRAY32 => unpackSeq(in.readInt(), in, compatibilityMode);
-        case MP_MAP16 => unpackMap(in.readShort() & MAX_16BIT, in, compatibilityMode)
-        case MP_MAP32 => unpackMap(in.readInt(), in, compatibilityMode);
-        case MP_RAW8  => unpackRaw(in.read(), in, 0)
-        case MP_RAW16 => unpackRaw(in.readShort() & MAX_16BIT, in, 0)
-        case MP_RAW32 => unpackRaw(in.readInt(), in, 0)
-        case MP_FALSE =>  false
-        case MP_TRUE =>   true
-        case MP_FLOAT =>  in.readFloat()
-        case MP_DOUBLE => in.readDouble()
-        case MP_NULL =>   null
-        case _ =>
-          throw new InvalidMsgPackDataException("Input contains invalid type value")
-      }
-
-    } catch {
-      case ex: EOFException =>
-        throw new InvalidMsgPackDataException("No more input available when expecting a value");
-    }
+    if (compatibilityMode) DefaultAnyCodecCompat.unpack(in)
+    else                   DefaultAnyCodec.unpack(in)
   }
 }
