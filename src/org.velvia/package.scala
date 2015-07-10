@@ -17,12 +17,19 @@ package object msgpack {
    * Warning: this does not do any recursion checks. If you pass a cyclic object,
    * you will run in an infinite loop until you run out of memory.
    *
-   * @param item
+   * NOTE: Please do not use this method for performance sensitive apps, but use the streaming
+   * API instead.  ByteArrayOutputStream is known to be very slow.  Anyways if you care about
+   * lots of data you would be streaming, right?  right?  :)
+   *
+   * @param item the item to serialize
+   * @param initSize the default initial size of the ByteArray buffer.  If you write
+   *        a large object this must be raised or else your app will spend lots of time
+   *        growing the ByteArray.
    * @return the packed data
    * @throws UnpackableItemException If the given data cannot be packed.
    */
-  def pack[A: Codec](item: A): Array[Byte] = {
-    val out = new ByteArrayOutputStream()
+  def pack[A: Codec](item: A, initSize: Int = 512): Array[Byte] = {
+    val out = new ByteArrayOutputStream(initSize)
     try {
       pack(item, new DataOutputStream(out))
     } catch {
