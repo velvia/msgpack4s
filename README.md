@@ -5,6 +5,7 @@ A super-simple MessagePack serialization library for Scala.
 
 * Simple, type-safe API
 * Extensible via `Codec` type classes
+* Designed and tested for long binary streaming applications
 * Directly unpacks maps, sequences, and any non-cyclic nested sequences/maps to Scala immutable collections
 * Can unpack `Map[Any, Any]` or `Map[String, Any]` without extra code, unlike msgpack-scala
 * No extra dependencies.  No need to build a separate Java library.
@@ -31,7 +32,23 @@ You will probably want to use the type-safe API that uses TypeClasses:
 import org.velvia.msgpack._
 import org.velvia.msgpack.SimpleCodecs._
 
-unpack[Int](pack(123))
+val byteArray = pack(123)
+val num = unpack[Int](byteArray)
+```
+
+msgpack4s is under the covers designed to work with streams - in fact it works great for very long binary streams and has been tested with that in mind.  Even the byte array APIs just wrap the streaming APIs with a `ByteArrayOutputStream`.  Here is how to use it in streaming mode, including ensuring that the streams get closed properly at the end or in case of failure:
+
+```scala
+import com.rojoma.simplearm.util._
+import java.io.DataOutputStream
+
+    for {
+      os <- managed(resp.getOutputStream)
+      dos <- managed(new DataOutputStream(os))
+      data <- listOfObjects
+    } {
+      msgpack.pack(data, dos)
+    }
 ```
 
 There are also the older APIs that work with Any, but are not type safe:
