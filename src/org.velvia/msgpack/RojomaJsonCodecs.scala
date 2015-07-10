@@ -14,7 +14,7 @@ object RojomaJsonCodecs {
 
   implicit object JNullCodec extends Codec[JNull] {
     def pack(out: DataOutputStream, item: JNull) { out.write(MP_NULL) }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_NULL -> { in: DIS => JNull }
     )
   }
@@ -57,11 +57,11 @@ object RojomaJsonCodecs {
         case j: JNull    => JNullCodec.pack(out, j)
       }
     }
-    val unpackFuncMap = JNullCodec.unpackFuncMap ++
-                        JBooleanCodec.unpackFuncMap ++
-                        JStringCodec.unpackFuncMap ++
-                        JNumberCodec.unpackFuncMap ++
-                        JArrayCodec.unpackFuncMap ++
-                        JObjectCodec.unpackFuncMap
+    val unpackFuncMap = JNullCodec.unpackFuncMap.mapAs[JValue] ++
+                        JBooleanCodec.unpackFuncMap.mapAs[JValue] ++
+                        JStringCodec.unpackFuncMap.mapAs[JValue] ++
+                        JNumberCodec.unpackFuncMap.mapAs[JValue] ++
+                        JArrayCodec.unpackFuncMap.mapAs[JValue] ++
+                        JObjectCodec.unpackFuncMap.mapAs[JValue]
   }
 }

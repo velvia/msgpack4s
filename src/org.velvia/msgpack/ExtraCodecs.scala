@@ -15,7 +15,7 @@ object ExtraCodecs {
       packLong(bd.scale, out)
       packRawBytes(bd.unscaledValue.toByteArray, out)
     }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       (MP_FIXARRAY | 0x2).toByte -> { in: DIS =>
         val scale = IntCodec.unpack(in)
         new BigDecimal(new java.math.BigInteger(ByteArrayCodec.unpack(in)), scale)

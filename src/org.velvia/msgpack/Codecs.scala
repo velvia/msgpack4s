@@ -14,10 +14,8 @@ trait Codec[@specialized(Int, Long, Short, Byte, Double, Float) A] {
   // throws an exception if the chunk does not match one of the supported types
   // in the unpackFuncMap.
   def unpack(in: DIS): A = {
-    val header = in.read()
-    if (header < 0) throw new InvalidMsgPackDataException("No more input available when expecting a value")
     try {
-      val headerByte = header.toByte
+      val headerByte = in.readByte()
       val func = unpackFuncMap.getOrElse(headerByte, defaultUnpackFunc(headerByte) )
       func(in)
     } catch {
@@ -33,7 +31,7 @@ trait Codec[@specialized(Int, Long, Short, Byte, Double, Float) A] {
 
   // The unpackFuncMap maps the first byte that contains the MessagePack format type
   // to a function passed a DIS to read any additional bytes required to unpack A.
-  val unpackFuncMap: Map[Byte, UnpackFunc]
+  val unpackFuncMap: FastByteMap[UnpackFunc]
 }
 
 /**
@@ -47,20 +45,20 @@ object SimpleCodecs {
       out.write(if (item) MP_TRUE else MP_FALSE)
     }
 
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_FALSE -> { dis: DIS => false },
       MP_TRUE  -> { dis: DIS => true }
     )
   }
 
-  val byteFuncMap: Map[Byte, DIS => Byte] =
+  val byteFuncMap = FastByteMap[DIS => Byte](
     (MP_NEGATIVE_FIXNUM.toInt to Byte.MaxValue).map(_.toByte).map { b =>
       b -> { dis: DIS => b }
-    }.toMap
+    } :_*)
 
   implicit object ByteCodec extends Codec[Byte] {
     def pack(out: DataOutputStream, item: Byte) { packLong(item.toLong, out) }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_UINT8 -> { in: DIS => in.readByte() },
       MP_INT8 ->  { in: DIS => in.readByte() }
     ) ++ byteFuncMap
@@ -68,7 +66,7 @@ object SimpleCodecs {
 
   implicit object ShortCodec extends Codec[Short] {
     def pack(out: DataOutputStream, item: Short) { packLong(item.toLong, out) }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_UINT16 -> { in: DIS => in.readShort() },
       MP_INT16  -> { in: DIS => in.readShort() },
       MP_UINT8  -> { in: DIS => in.readUnsignedByte().toShort },
@@ -78,7 +76,7 @@ object SimpleCodecs {
 
   implicit object IntCodec extends Codec[Int] {
     def pack(out: DataOutputStream, item: Int) { packLong(item.toLong, out) }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_UINT16 -> { in: DIS => in.readShort() & MAX_16BIT },
       MP_INT16  -> { in: DIS => in.readShort().toInt },
       MP_UINT32 -> { in: DIS => in.readInt() },
@@ -90,7 +88,7 @@ object SimpleCodecs {
 
   implicit object LongCodec extends Codec[Long] {
     def pack(out: DataOutputStream, item: Long) { packLong(item, out) }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_UINT16 -> { in: DIS => (in.readShort() & MAX_16BIT).toLong },
       MP_INT16  -> { in: DIS => in.readShort().toLong },
       MP_UINT32 -> { in: DIS => in.readInt() & MAX_32BIT },
@@ -108,7 +106,7 @@ object SimpleCodecs {
       out.writeFloat(item)
     }
 
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_FLOAT -> { in: DIS => in.readFloat() }
     )
   }
@@ -119,7 +117,7 @@ object SimpleCodecs {
       out.writeDouble(item)
     }
 
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_DOUBLE -> { in: DIS => in.readDouble() }
     )
   }
@@ -134,7 +132,7 @@ object RawStringCodecs {
 
   implicit object StringCodec extends Codec[String] {
     def pack(out: DataOutputStream, item: String) { packString(item, out) }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
         MP_STR8  -> { in: DIS => unpackString(in.read(), in) },
         MP_STR16 -> { in: DIS => unpackString(in.readShort() & MAX_16BIT, in) },
         MP_STR32 -> { in: DIS => unpackString(in.readInt(), in) }
@@ -145,14 +143,15 @@ object RawStringCodecs {
 
   implicit object ByteArrayCodec extends Codec[Array[Byte]] {
     def pack(out: DataOutputStream, item: Array[Byte]) { packRawBytes(item, out) }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
         MP_RAW8  -> { in: DIS => unpackByteArray(in.read(), in) },
         MP_RAW16 -> { in: DIS => unpackByteArray(in.readShort() & MAX_16BIT, in) },
         MP_RAW32 -> { in: DIS => unpackByteArray(in.readInt(), in) }
     )
   }
 
-  val allFuncMaps = StringCodec.unpackFuncMap ++ ByteArrayCodec.unpackFuncMap
+  val allFuncMaps = StringCodec.unpackFuncMap.mapAnyFunc ++
+                    ByteArrayCodec.unpackFuncMap.mapAnyFunc
 }
 
 /**
@@ -164,7 +163,7 @@ object CompatibilityCodecs {
 
   implicit object ByteArrayCodec extends Codec[Array[Byte]] {
     def pack(out: DataOutputStream, item: Array[Byte]) { ??? }
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
         MP_STR16 -> { in: DIS => unpackByteArray(in.readShort() & MAX_16BIT, in) },
         MP_STR32 -> { in: DIS => unpackByteArray(in.readInt(), in) }
     ) ++ (0 to MAX_5BIT).map { strlen =>
@@ -224,7 +223,7 @@ object AnyCodecs {
       }
     }
 
-    val unpackFuncMapBase = Map[Byte, UnpackFunc](
+    val unpackFuncMapBase = FastByteMap[UnpackFunc](
       MP_NULL   -> { in: DIS => null },
       MP_UINT64 -> { in: DIS =>   // Return a bigInt, it could be > Long.MaxValue
           val v = in.readLong()
@@ -236,15 +235,15 @@ object AnyCodecs {
                                        ((v >> 8) & 0xff).toByte, (v & 0xff).toByte))
                    },
       MP_INT64  -> { in: DIS => in.readLong() }
-    ) ++ IntCodec.unpackFuncMap ++
-         BooleanCodec.unpackFuncMap ++
-         FloatCodec.unpackFuncMap ++
-         DoubleCodec.unpackFuncMap ++
-         seqCodec.unpackFuncMap ++
-         mapCodec.unpackFuncMap
+    ) ++ IntCodec.unpackFuncMap.mapAnyFunc ++
+         BooleanCodec.unpackFuncMap.mapAnyFunc ++
+         FloatCodec.unpackFuncMap.mapAnyFunc ++
+         DoubleCodec.unpackFuncMap.mapAnyFunc ++
+         seqCodec.unpackFuncMap.mapAnyFunc ++
+         mapCodec.unpackFuncMap.mapAnyFunc
 
     val unpackFuncMap = unpackFuncMapBase ++ {
-                        if (compatibilityMode) CompatibilityCodecs.ByteArrayCodec.unpackFuncMap
+                        if (compatibilityMode) CompatibilityCodecs.ByteArrayCodec.unpackFuncMap.mapAnyFunc
                         else                   RawStringCodecs.allFuncMaps }
   }
 

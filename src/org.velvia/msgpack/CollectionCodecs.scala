@@ -9,7 +9,7 @@ object CollectionCodecs {
   class SeqCodec[T: Codec] extends Codec[Seq[T]] {
     def pack(out: DataOutputStream, s: Seq[T]) { packSeq(s, out) }
 
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_ARRAY16 -> { in: DIS => unpackSeq(in.readShort() & MAX_16BIT, in) },
       MP_ARRAY32 -> { in: DIS => unpackSeq(in.readInt(), in) }
     ) ++ (0 to MAX_4BIT).map { len =>
@@ -23,7 +23,7 @@ object CollectionCodecs {
 
     def pack(out: DataOutputStream, m: Map[K, V]) { packMap(m, out) }
 
-    val unpackFuncMap = Map[Byte, UnpackFunc](
+    val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_MAP16 -> { in: DIS => unpackMap(in.readShort() & MAX_16BIT, in)(keyCodec, valCodec) },
       MP_MAP32 -> { in: DIS => unpackMap(in.readInt(), in)(keyCodec, valCodec) }
     ) ++ (0 to MAX_4BIT).map { len =>
