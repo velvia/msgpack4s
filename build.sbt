@@ -27,3 +27,8 @@ libraryDependencies ++= Seq("com.rojoma" %% "rojoma-json-v3" % "3.3.0" % "provid
 Seq(bintrayPublishSettings: _*)
 
 licenses += ("Apache-2.0", url("http://choosealicense.com/licenses/apache/"))
+
+lazy val msgpack4s = (project in file("."))
+
+lazy val jmh = (project in file("jmh")).dependsOn(msgpack4s)
+                        .settings(jmhSettings:_*)
