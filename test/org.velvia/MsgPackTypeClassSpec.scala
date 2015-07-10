@@ -1,5 +1,6 @@
 package org.velvia
 
+import java.math.BigDecimal
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 
@@ -55,6 +56,16 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
     it("should pack and unpack Maps") {
       val map = Map("apples" -> 1, "bears" -> -5, "oranges" -> 100)
       unpack(pack(map)(strIntMapCodec))(strIntMapCodec) should equal (map)
+    }
+  }
+
+  describe("extras packing and unpacking") {
+    import org.velvia.msgpack.ExtraCodecs._
+
+    it("should pack and unpack BigDecimal") {
+      unpack[BigDecimal](pack(new BigDecimal(1000))) should equal (new BigDecimal(1000))
+      val bdPi = new BigDecimal(Math.PI)
+      unpack[BigDecimal](pack(bdPi)) should equal (bdPi)
     }
   }
 }
