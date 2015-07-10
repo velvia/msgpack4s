@@ -20,9 +20,10 @@ unmanagedSourceDirectories in Test <++= Seq(baseDirectory(_ / "test" )).join
 libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "2.2.0" % "test",
                             "org.mockito" % "mockito-all" % "1.9.0" % "test")
 
+lazy val rojomaJson = "com.rojoma" %% "rojoma-json-v3" % "3.3.0"
+
 // Extra dependencies for type classes for JSON libraries
-libraryDependencies ++= Seq("com.rojoma" %% "rojoma-json-v3" % "3.3.0" % "provided"
-                            )
+libraryDependencies ++= Seq(rojomaJson % "provided")
 
 Seq(bintrayPublishSettings: _*)
 
@@ -32,3 +33,4 @@ lazy val msgpack4s = (project in file("."))
 
 lazy val jmh = (project in file("jmh")).dependsOn(msgpack4s)
                         .settings(jmhSettings:_*)
+                        .settings(libraryDependencies += rojomaJson)
