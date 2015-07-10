@@ -41,8 +41,8 @@ object RojomaJsonCodecs {
   }
 
   implicit object JObjectCodec extends Codec[JObject] {
-    lazy val mapCodec = new CollectionCodecs.MapCodec()(StringCodec, JValueCodec)
-    def pack(out: DataOutputStream, m: JObject) { mapCodec.pack(out, m.fields.toMap) }
+    lazy val mapCodec = new CollectionCodecs.CMapCodec()(StringCodec, JValueCodec)
+    def pack(out: DataOutputStream, m: JObject) { mapCodec.pack(out, m.fields) }
     lazy val unpackFuncMap = mapCodec.unpackFuncMap.mapValues(_.andThen(JObject(_)))
   }
 

@@ -1,0 +1,561 @@
+{
+  "id" : "w2m8-wu5q",
+  "name" : "New Visualize testing not delete",
+  "averageRating" : 0,
+  "createdAt" : 1383613024,
+  "displayType" : "chart",
+  "downloadCount" : 6,
+  "indexUpdatedAt" : 1418094767,
+  "moderationStatus" : true,
+  "newBackend" : false,
+  "numberOfComments" : 2,
+  "oid" : 93007,
+  "publicationAppendEnabled" : true,
+  "publicationDate" : 1390326932,
+  "publicationGroup" : 12536,
+  "publicationStage" : "published",
+  "rowsUpdatedAt" : 1398916994,
+  "rowsUpdatedBy" : "ufjq-hmyn",
+  "tableId" : 68222,
+  "totalTimesRated" : 0,
+  "viewCount" : 47174,
+  "viewLastModified" : 1418094767,
+  "viewType" : "tabular",
+  "columns" : [ {
+    "id" : 416943,
+    "name" : "Year",
+    "dataTypeName" : "number",
+    "fieldName" : "year",
+    "position" : 1,
+    "renderTypeName" : "number",
+    "tableColumnId" : 47750,
+    "width" : 148,
+    "cachedContents" : {
+      "non_null" : 9,
+      "smallest" : "2009",
+      "sum" : "18090",
+      "null" : 0,
+      "average" : "2010",
+      "largest" : "2011",
+      "top" : [ {
+        "count" : 20,
+        "item" : "2009"
+      }, {
+        "count" : 19,
+        "item" : "2010"
+      }, {
+        "count" : 18,
+        "item" : "2011"
+      } ]
+    },
+    "format" : {
+      "precisionStyle" : "standard",
+      "align" : "right",
+      "noCommas" : "true"
+    }
+  }, {
+    "id" : 416944,
+    "name" : "First Name",
+    "dataTypeName" : "text",
+    "fieldName" : "first_name",
+    "position" : 2,
+    "renderTypeName" : "text",
+    "tableColumnId" : 47751,
+    "width" : 220,
+    "cachedContents" : {
+      "non_null" : 9,
+      "smallest" : "AARON",
+      "null" : 0,
+      "largest" : "MARK",
+      "top" : [ {
+        "count" : 20,
+        "item" : "AARON"
+      }, {
+        "count" : 19,
+        "item" : "DANIEL"
+      }, {
+        "count" : 18,
+        "item" : "MARK"
+      } ]
+    },
+    "format" : {
+    }
+  }, {
+    "id" : 416945,
+    "name" : "Sex",
+    "dataTypeName" : "text",
+    "fieldName" : "sex",
+    "position" : 3,
+    "renderTypeName" : "text",
+    "tableColumnId" : 47752,
+    "width" : 136,
+    "cachedContents" : {
+      "non_null" : 9,
+      "smallest" : "M",
+      "null" : 0,
+      "largest" : "M",
+      "top" : [ {
+        "count" : 20,
+        "item" : "M"
+      } ]
+    },
+    "format" : {
+    }
+  }, {
+    "id" : 416946,
+    "name" : "Count",
+    "dataTypeName" : "number",
+    "fieldName" : "count",
+    "position" : 4,
+    "renderTypeName" : "number",
+    "tableColumnId" : 47753,
+    "width" : 160,
+    "cachedContents" : {
+      "non_null" : 9,
+      "smallest" : "93",
+      "sum" : "5103",
+      "null" : 0,
+      "average" : "567",
+      "largest" : "1292",
+      "top" : [ {
+        "count" : 20,
+        "item" : "423"
+      }, {
+        "count" : 19,
+        "item" : "404"
+      }, {
+        "count" : 18,
+        "item" : "417"
+      }, {
+        "count" : 17,
+        "item" : "1292"
+      }, {
+        "count" : 16,
+        "item" : "1138"
+      }, {
+        "count" : 15,
+        "item" : "1052"
+      }, {
+        "count" : 14,
+        "item" : "132"
+      }, {
+        "count" : 13,
+        "item" : "93"
+      }, {
+        "count" : 12,
+        "item" : "152"
+      } ]
+    },
+    "format" : {
+    }
+  } ],
+  "displayFormat" : {
+    "hideDsgMsg" : false,
+    "valueColumns" : [ {
+      "color" : "#003366",
+      "fieldName" : "count"
+    } ],
+    "fixedColumns" : [ "first_name" ],
+    "seriesColumns" : [ {
+      "fieldName" : "year"
+    } ],
+    "pointSize" : "3",
+    "colors" : [ "#003366", "#D95F02", "#1B9E77", "#e6ab02", "#7570b3" ],
+    "smoothLine" : false,
+    "sortSeries" : false,
+    "lineSize" : "2",
+    "chartType" : "line",
+    "yAxis" : {
+      "formatter" : {
+        "abbreviate" : false
+      }
+    },
+    "dataLabels" : false,
+    "legendDetails" : {
+      "showSeries" : true,
+      "showValueMarkers" : true
+    },
+    "legend" : "bottom",
+    "descriptionColumns" : [ {
+    } ]
+  },
+  "grants" : [ {
+    "inherited" : true,
+    "type" : "viewer",
+    "flags" : [ "public" ]
+  }, {
+    "inherited" : false,
+    "type" : "viewer",
+    "userId" : "fenw-99f4"
+  } ],
+  "metadata" : {
+    "custom_fields" : {
+      "Test New" : {
+        "Pass" : ""
+      },
+      "new 1" : {
+        "new 3" : "",
+        "new 4" : ""
+      },
+      "NMP" : {
+        "No" : ""
+      },
+      "ertert" : {
+        "qwewe" : ""
+      },
+      "Plan Details" : {
+        "Plan Name" : "",
+        "Leadership Dashboard" : ""
+      }
+    },
+    "renderTypeConfig" : {
+      "visible" : {
+        "chart" : true,
+        "table" : true
+      }
+    },
+    "availableDisplayTypes" : [ "chart", "table", "fatrow", "page" ],
+    "thumbnail" : {
+      "page" : {
+        "created" : true,
+        "selection" : {
+          "height" : 503,
+          "width" : 942,
+          "y1" : 15,
+          "y2" : 518,
+          "x2" : 1214,
+          "x1" : 272
+        },
+        "blobId" : "92ba94b745ba58d854120e648b0c04cf"
+      }
+    },
+    "jsonQuery" : {
+      "where" : {
+        "children" : [ {
+          "children" : [ {
+            "value" : "mark",
+            "operator" : "EQUALS",
+            "columnFieldName" : "first_name",
+            "metadata" : {
+              "freeform" : true
+            }
+          }, {
+            "value" : "daniel",
+            "operator" : "EQUALS",
+            "columnFieldName" : "first_name",
+            "metadata" : {
+              "freeform" : true
+            }
+          }, {
+            "value" : "aaron",
+            "operator" : "EQUALS",
+            "columnFieldName" : "first_name",
+            "metadata" : {
+              "freeform" : true
+            }
+          } ],
+          "operator" : "OR",
+          "metadata" : {
+            "customValues" : [ [ "kyle" ], [ "brian" ] ],
+            "tableColumnId" : {
+              "12536" : 47751
+            },
+            "operator" : "EQUALS"
+          }
+        }, {
+          "children" : [ {
+            "value" : 2009,
+            "operator" : "EQUALS",
+            "columnFieldName" : "year",
+            "metadata" : {
+              "freeform" : true
+            }
+          }, {
+            "value" : 2010,
+            "operator" : "EQUALS",
+            "columnFieldName" : "year",
+            "metadata" : {
+              "freeform" : true
+            }
+          }, {
+            "value" : 2011,
+            "operator" : "EQUALS",
+            "columnFieldName" : "year",
+            "metadata" : {
+              "freeform" : true
+            }
+          } ],
+          "operator" : "OR",
+          "metadata" : {
+            "tableColumnId" : {
+              "12536" : 47750
+            },
+            "operator" : "EQUALS"
+          }
+        } ],
+        "operator" : "AND",
+        "metadata" : {
+          "unifiedVersion" : 2
+        }
+      }
+    },
+    "conditionalFormatting" : [ {
+      "color" : "#ff0000",
+      "condition" : {
+        "_key" : "(47751|STARTS_WITH|D)",
+        "value" : "D",
+        "tableColumnId" : 47751,
+        "operator" : "STARTS_WITH"
+      }
+    } ]
+  },
+  "owner" : {
+    "id" : "3nte-ch42",
+    "displayName" : "anu",
+    "profileImageUrlLarge" : "/api/users/3nte-ch42/profile_images/LARGE",
+    "profileImageUrlMedium" : "/api/users/3nte-ch42/profile_images/THUMB",
+    "profileImageUrlSmall" : "/api/users/3nte-ch42/profile_images/TINY",
+    "screenName" : "anu",
+    "rights" : [ "create_datasets", "edit_others_datasets", "edit_sdp", "edit_site_theme", "moderate_comments", "manage_users", "chown_datasets", "edit_nominations", "approve_nominations", "feature_items", "federations", "manage_stories", "manage_approval", "change_configurations", "view_domain", "view_others_datasets", "edit_pages", "create_pages", "short_session", "view_goals", "view_dashboards", "edit_goals", "edit_dashboards", "create_dashboards" ],
+    "flags" : [ "admin" ]
+  },
+  "privateMetadata" : {
+    "custom_fields" : {
+      "Test New" : {
+        "Fail" : ""
+      },
+      "NMP" : {
+        "Yes" : "",
+        "Not Sure" : ""
+      },
+      "Plan Details" : {
+        "Archive" : ""
+      }
+    }
+  },
+  "query" : {
+    "filterCondition" : {
+      "type" : "operator",
+      "value" : "AND",
+      "children" : [ {
+        "type" : "operator",
+        "value" : "OR",
+        "children" : [ {
+          "type" : "operator",
+          "value" : "EQUALS",
+          "children" : [ {
+            "columnId" : 416944,
+            "type" : "column"
+          }, {
+            "type" : "literal",
+            "value" : "mARK"
+          } ],
+          "metadata" : {
+            "freeform" : true
+          }
+        }, {
+          "type" : "operator",
+          "value" : "EQUALS",
+          "children" : [ {
+            "columnId" : 416944,
+            "type" : "column"
+          }, {
+            "type" : "literal",
+            "value" : "daniel"
+          } ],
+          "metadata" : {
+            "freeform" : true
+          }
+        }, {
+          "type" : "operator",
+          "value" : "EQUALS",
+          "children" : [ {
+            "columnId" : 416944,
+            "type" : "column"
+          }, {
+            "type" : "literal",
+            "value" : "aaron"
+          } ],
+          "metadata" : {
+            "freeform" : true
+          }
+        } ],
+        "metadata" : {
+          "operator" : "EQUALS",
+          "tableColumnId" : {
+            "12536" : 47751
+          },
+          "customValues" : [ [ "kyle" ], [ "brian" ] ]
+        }
+      }, {
+        "type" : "operator",
+        "value" : "OR",
+        "children" : [ {
+          "type" : "operator",
+          "value" : "EQUALS",
+          "children" : [ {
+            "columnId" : 416943,
+            "type" : "column"
+          }, {
+            "type" : "literal",
+            "value" : "2009"
+          } ],
+          "metadata" : {
+            "freeform" : true
+          }
+        }, {
+          "type" : "operator",
+          "value" : "EQUALS",
+          "children" : [ {
+            "columnId" : 416943,
+            "type" : "column"
+          }, {
+            "type" : "literal",
+            "value" : "2010"
+          } ],
+          "metadata" : {
+            "freeform" : true
+          }
+        }, {
+          "type" : "operator",
+          "value" : "EQUALS",
+          "children" : [ {
+            "columnId" : 416943,
+            "type" : "column"
+          }, {
+            "type" : "literal",
+            "value" : "2011"
+          } ],
+          "metadata" : {
+            "freeform" : true
+          }
+        } ],
+        "metadata" : {
+          "operator" : "EQUALS",
+          "tableColumnId" : {
+            "12536" : 47750
+          }
+        }
+      } ],
+      "metadata" : {
+        "unifiedVersion" : 2
+      }
+    }
+  },
+  "rights" : [ "read", "write", "add", "delete", "grant", "add_column", "remove_column", "update_column", "update_view", "delete_view" ],
+  "tableAuthor" : {
+    "id" : "tirm-miwi",
+    "displayName" : "Karin Hellman",
+    "roleName" : "publisher",
+    "screenName" : "Karin Hellman",
+    "rights" : [ "create_datasets", "edit_others_datasets", "chown_datasets", "edit_nominations", "approve_nominations", "moderate_comments", "manage_stories", "feature_items", "change_configurations", "view_domain", "view_others_datasets", "view_goals", "view_dashboards", "edit_goals", "edit_dashboards" ],
+    "flags" : [ "admin" ]
+  },
+  "viewFilters" : {
+    "type" : "operator",
+    "value" : "AND",
+    "children" : [ {
+      "type" : "operator",
+      "value" : "OR",
+      "children" : [ {
+        "type" : "operator",
+        "value" : "EQUALS",
+        "children" : [ {
+          "columnId" : 416944,
+          "type" : "column"
+        }, {
+          "type" : "literal",
+          "value" : "mARK"
+        } ],
+        "metadata" : {
+          "freeform" : true
+        }
+      }, {
+        "type" : "operator",
+        "value" : "EQUALS",
+        "children" : [ {
+          "columnId" : 416944,
+          "type" : "column"
+        }, {
+          "type" : "literal",
+          "value" : "daniel"
+        } ],
+        "metadata" : {
+          "freeform" : true
+        }
+      }, {
+        "type" : "operator",
+        "value" : "EQUALS",
+        "children" : [ {
+          "columnId" : 416944,
+          "type" : "column"
+        }, {
+          "type" : "literal",
+          "value" : "aaron"
+        } ],
+        "metadata" : {
+          "freeform" : true
+        }
+      } ],
+      "metadata" : {
+        "operator" : "EQUALS",
+        "tableColumnId" : {
+          "12536" : 47751
+        },
+        "customValues" : [ [ "kyle" ], [ "brian" ] ]
+      }
+    }, {
+      "type" : "operator",
+      "value" : "OR",
+      "children" : [ {
+        "type" : "operator",
+        "value" : "EQUALS",
+        "children" : [ {
+          "columnId" : 416943,
+          "type" : "column"
+        }, {
+          "type" : "literal",
+          "value" : "2009"
+        } ],
+        "metadata" : {
+          "freeform" : true
+        }
+      }, {
+        "type" : "operator",
+        "value" : "EQUALS",
+        "children" : [ {
+          "columnId" : 416943,
+          "type" : "column"
+        }, {
+          "type" : "literal",
+          "value" : "2010"
+        } ],
+        "metadata" : {
+          "freeform" : true
+        }
+      }, {
+        "type" : "operator",
+        "value" : "EQUALS",
+        "children" : [ {
+          "columnId" : 416943,
+          "type" : "column"
+        }, {
+          "type" : "literal",
+          "value" : "2011"
+        } ],
+        "metadata" : {
+          "freeform" : true
+        }
+      } ],
+      "metadata" : {
+        "operator" : "EQUALS",
+        "tableColumnId" : {
+          "12536" : 47750
+        }
+      }
+    } ],
+    "metadata" : {
+      "unifiedVersion" : 2
+    }
+  }
+}

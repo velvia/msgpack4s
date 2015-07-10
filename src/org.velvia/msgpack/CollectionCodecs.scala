@@ -1,6 +1,7 @@
 package org.velvia.msgpack
 
 import java.io.{DataInputStream => DIS, DataOutputStream}
+import scala.collection.{Map => CMap}
 
 object CollectionCodecs {
   import Format._
@@ -23,6 +24,21 @@ object CollectionCodecs {
 
     def pack(out: DataOutputStream, m: Map[K, V]) { packMap(m, out) }
 
+    val unpackFuncMap = FastByteMap[UnpackFunc](
+      MP_MAP16 -> { in: DIS => unpackMap(in.readShort() & MAX_16BIT, in)(keyCodec, valCodec) },
+      MP_MAP32 -> { in: DIS => unpackMap(in.readInt(), in)(keyCodec, valCodec) }
+    ) ++ (0 to MAX_4BIT).map { len =>
+      (MP_FIXMAP | len).toByte -> { in: DIS => unpackMap(len, in)(keyCodec, valCodec) }
+    }
+  }
+
+  class CMapCodec[K: Codec, V: Codec] extends Codec[CMap[K, V]] {
+    private val keyCodec = implicitly[Codec[K]]
+    private val valCodec = implicitly[Codec[V]]
+
+    def pack(out: DataOutputStream, m: CMap[K, V]) { packMap(m, out) }
+
+    // Unfortunately have to copy this, maybe can share via trait or something
     val unpackFuncMap = FastByteMap[UnpackFunc](
       MP_MAP16 -> { in: DIS => unpackMap(in.readShort() & MAX_16BIT, in)(keyCodec, valCodec) },
       MP_MAP32 -> { in: DIS => unpackMap(in.readInt(), in)(keyCodec, valCodec) }
