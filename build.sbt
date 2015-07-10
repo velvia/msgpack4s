@@ -20,6 +20,10 @@ unmanagedSourceDirectories in Test <++= Seq(baseDirectory(_ / "test" )).join
 libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "2.2.0" % "test",
                             "org.mockito" % "mockito-all" % "1.9.0" % "test")
 
+// Extra dependencies for type classes for JSON libraries
+libraryDependencies ++= Seq("com.rojoma" %% "rojoma-json-v3" % "3.3.0" % "provided"
+                            )
+
 Seq(bintrayPublishSettings: _*)
 
 licenses += ("Apache-2.0", url("http://choosealicense.com/licenses/apache/"))
