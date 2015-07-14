@@ -35,6 +35,7 @@ visor_Dists.1"}
   val ast = JsonReader.fromString(rawJsonStr)
   val os = new org.apache.commons.io.output.NullOutputStream
   val dos = new java.io.DataOutputStream(os)
+  val osw = new java.io.OutputStreamWriter(os)
 
   import org.velvia.msgpack.RojomaJsonCodecs._
 
@@ -59,12 +60,7 @@ visor_Dists.1"}
   def rojomaAstJson(): Int = {
     var total = 0
     while (total < 100) {
-      // To make writing to a string and outputting to a stream roughly equivalent,
-      // we take the string, chunk it and feed it into the DOS, similar to what msgpack4s would do
-      CompactJsonWriter.toString(ast).grouped(50).
-                        map(_.getBytes("UTF-8")).
-                        foreach(dos.write)
-      dos.flush()
+      CompactJsonWriter.toWriter(osw, ast)
       total += 1
     }
     total
