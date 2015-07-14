@@ -1,7 +1,7 @@
 package org.velvia.msgpack
 
 import java.io.{DataInputStream => DIS, DataOutputStream}
-import java.math.BigDecimal
+import java.math.{BigDecimal, BigInteger}
 
 object ExtraCodecs {
   import Format._
@@ -21,5 +21,11 @@ object ExtraCodecs {
         new BigDecimal(new java.math.BigInteger(ByteArrayCodec.unpack(in)), scale)
       }
     )
+  }
+
+  // BigInteger is packed as a byte array
+  implicit object BigIntegerCodec extends Codec[BigInteger] {
+    def pack(out: DataOutputStream, item: BigInteger) { ByteArrayCodec.pack(out, item.toByteArray) }
+    val unpackFuncMap = ByteArrayCodec.unpackFuncMap.mapValues(_.andThen(new BigInteger(_)))
   }
 }

@@ -1,6 +1,6 @@
 package org.velvia
 
-import java.math.BigDecimal
+import java.math.{BigDecimal, BigInteger}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 
@@ -66,6 +66,10 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
       unpack[BigDecimal](pack(new BigDecimal(1000))) should equal (new BigDecimal(1000))
       val bdPi = new BigDecimal(Math.PI)
       unpack[BigDecimal](pack(bdPi)) should equal (bdPi)
+    }
+
+    it("should pack and unpack BigInteger") {
+      unpack[BigInteger](pack(new BigInteger("1000"))) should equal (new BigInteger("1000"))
     }
   }
 }
