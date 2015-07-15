@@ -142,6 +142,10 @@ object Format {
   }
 
   def packMap[K: Codec, V: Codec](map: collection.Map[K, V], out: DataOutputStream) {
+    packMapSeq(map.iterator.toSeq, out)   // Creates a Stream, more efficient than toSeq directly
+  }
+
+  def packMapSeq[K: Codec, V: Codec](map: Seq[(K, V)], out: DataOutputStream) {
     val keyCodec = implicitly[Codec[K]]
     val valCodec = implicitly[Codec[V]]
     if (map.size <= MAX_4BIT) {
