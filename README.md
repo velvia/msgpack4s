@@ -24,7 +24,7 @@ Include this in `build.sbt`:
 ```scala
 resolvers += "velvia maven" at "http://dl.bintray.com/velvia/maven"
 
-libraryDependencies += "org.velvia" %% "msgpack4s" % "0.4.3"
+libraryDependencies += "org.velvia" %% "msgpack4s" % "0.5.0"
 ```
 
 Currently cross-compiled for Scala 2.10 and 2.11.
