@@ -142,22 +142,29 @@ object Format {
   }
 
   def packMap[K: Codec, V: Codec](map: collection.Map[K, V], out: DataOutputStream) {
-    packMapSeq(map.iterator.toSeq, out)   // Creates a Stream, more efficient than toSeq directly
+    val keyCodec = implicitly[Codec[K]]
+    val valCodec = implicitly[Codec[V]]
+    writeMapHeader(map.size, out)
+    map foreach { case (k, v) => keyCodec.pack(out, k); valCodec.pack(out, v) }
   }
 
   def packMapSeq[K: Codec, V: Codec](map: Seq[(K, V)], out: DataOutputStream) {
     val keyCodec = implicitly[Codec[K]]
     val valCodec = implicitly[Codec[V]]
-    if (map.size <= MAX_4BIT) {
-      out.write(map.size | MP_FIXMAP)
-    } else if (map.size <= MAX_16BIT) {
+    writeMapHeader(map.size, out)
+    map foreach { case (k, v) => keyCodec.pack(out, k); valCodec.pack(out, v) }
+  }
+
+  private def writeMapHeader(mapSize: Int, out: DataOutputStream) {
+    if (mapSize <= MAX_4BIT) {
+      out.write(mapSize | MP_FIXMAP)
+    } else if (mapSize <= MAX_16BIT) {
       out.write(MP_MAP16)
-      out.writeShort(map.size)
+      out.writeShort(mapSize)
     } else {
       out.write(MP_MAP32)
-      out.writeInt(map.size)
+      out.writeInt(mapSize)
     }
-    map foreach { case (k, v) => keyCodec.pack(out, k); valCodec.pack(out, v) }
   }
 
   val UNPACK_RAW_AS_STRING = 0x1
