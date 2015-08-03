@@ -23,10 +23,12 @@ libraryDependencies ++= Seq("org.scalatest" %% "scalatest" % "2.2.0" % "test",
 lazy val rojomaJson = "com.rojoma" %% "rojoma-json-v3" % "3.3.0"
 lazy val json4s     = "org.json4s" %% "json4s-native" % "3.2.11"
 lazy val commonsIo  = "org.apache.commons" % "commons-io" % "1.3.2"
+lazy val playJson   = "com.typesafe.play" %% "play-json" % "2.4.1"
 
 // Extra dependencies for type classes for JSON libraries
 libraryDependencies ++= Seq(rojomaJson % "provided",
-                            json4s     % "provided")
+                            json4s     % "provided",
+                            playJson   % "provided")
 
 Seq(bintrayPublishSettings: _*)
 
