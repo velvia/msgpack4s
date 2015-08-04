@@ -76,19 +76,20 @@ object Format {
   }
 
   def packString(str: String, out: DataOutputStream) {
-    if (str.length <= MAX_5BIT) {
-      out.write(str.length | MP_FIXSTR)
-    } else if (str.length <= MAX_8BIT) {
+    val bytes = str.getBytes("UTF-8")
+    if (bytes.length <= MAX_5BIT) {
+      out.write(bytes.length | MP_FIXSTR)
+    } else if (bytes.length <= MAX_8BIT) {
       out.write(MP_STR8)
-      out.write(str.length)
-    } else if (str.length <= MAX_16BIT) {
+      out.write(bytes.length)
+    } else if (bytes.length <= MAX_16BIT) {
       out.write(MP_STR16)
-      out.writeShort(str.length)
+      out.writeShort(bytes.length)
     } else {
       out.write(MP_STR32)
-      out.writeInt(str.length)
+      out.writeInt(bytes.length)
     }
-    out.write(str.getBytes("UTF-8"))
+    out.write(bytes)
   }
 
   def packLong(value: Long, out: DataOutputStream) {

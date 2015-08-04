@@ -37,6 +37,11 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
       val longerStr = "The quick brown fox jumped over the lazy fence"
       unpack[String](pack(longerStr)) should equal (longerStr)
     }
+
+    it("should unpack and pack Unicode strings") {
+      val korean = "안녕"
+      unpack[String](pack(korean)) should equal (korean)
+    }
   }
 
   describe("collections packing and unpacking") {
