@@ -1,4 +1,4 @@
-package com.paidy.api.messagepack
+package org.velvia.msgpack
 
 import java.io.{ DataInputStream ⇒ DIS, DataOutputStream }
 
