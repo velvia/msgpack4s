@@ -5,7 +5,7 @@ import java.io.{ DataInputStream ⇒ DIS, DataOutputStream }
 import play.api.libs.json._
 import org.velvia.msgpack._
 
-trait PlayJsonCodecs {
+object PlayJsonCodecs {
   import org.velvia.msgpack.Format._
   import SimpleCodecs._
   import RawStringCodecs.StringCodec
@@ -67,5 +67,3 @@ trait PlayJsonCodecs {
         JsArrayCodec.unpackFuncMap.mapAs[JsValue]
   }
 }
-
-object PlayJsonCodecs extends PlayJsonCodecs
