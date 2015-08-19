@@ -1,6 +1,8 @@
 msgpack4s
 =========
 
+[![Build Status](https://travis-ci.org/velvia/msgpack4s.svg?branch=master)](https://travis-ci.org/velvia/msgpack4s)
+
 A super-simple MessagePack serialization library for Scala.
 
 * Simple, type-safe API
