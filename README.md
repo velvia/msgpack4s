@@ -8,7 +8,7 @@ A super-simple MessagePack serialization library for Scala.
 * Simple, type-safe API
 * Extensible via `Codec` type classes
 * Designed and tested for long binary streaming applications
-* Built-in support for [Json4s](http://github.com/json4s/json4s) and [rojoma-json](http://github.com/rjmac/rojoma-json) ASTs... easily supercharge your JSON Scala apps!
+* Built-in support for [Json4s](http://github.com/json4s/json4s), Play-JSON, and [rojoma-json](http://github.com/rjmac/rojoma-json) ASTs... easily supercharge your JSON Scala apps!
     - 10x speedup over Json4s for double-heavy applications such as GeoJSON
     - Over 2x speedup for regular string-heavy JSON documents
 * Directly unpacks maps, sequences, and any non-cyclic nested sequences/maps to Scala immutable collections
@@ -26,7 +26,7 @@ Include this in `build.sbt`:
 ```scala
 resolvers += "velvia maven" at "http://dl.bintray.com/velvia/maven"
 
-libraryDependencies += "org.velvia" %% "msgpack4s" % "0.5.0"
+libraryDependencies += "org.velvia" %% "msgpack4s" % "0.5.1"
 ```
 
 Currently cross-compiled for Scala 2.10 and 2.11.
