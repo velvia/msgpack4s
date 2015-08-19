@@ -6,3 +6,5 @@ resolvers += Resolver.url(
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.1.1")
 
 addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.1.12")
+
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.0")
