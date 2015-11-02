@@ -31,14 +31,14 @@ object TupleCodecs {
     private val codec3 = implicitly[Codec[A3]]
 
     def pack(out: DataOutputStream, item: (A1, A2, A3)): Unit = {
-      out.write(0x02 | Format.MP_FIXARRAY)
+      out.write(0x03 | Format.MP_FIXARRAY)
       codec1.pack(out, item._1)
       codec2.pack(out, item._2)
       codec3.pack(out, item._3)
     }
 
     val unpackFuncMap = FastByteMap[UnpackFunc](
-      (0x02 | Format.MP_FIXARRAY).toByte -> { in: DIS =>
+      (0x03 | Format.MP_FIXARRAY).toByte -> { in: DIS =>
         val r1 = codec1.unpack(in)
         val r2 = codec2.unpack(in)
         val r3 = codec3.unpack(in)
@@ -56,7 +56,7 @@ object TupleCodecs {
     private val codec4 = implicitly[Codec[A4]]
 
     def pack(out: DataOutputStream, item: (A1, A2, A3, A4)): Unit = {
-      out.write(0x02 | Format.MP_FIXARRAY)
+      out.write(0x04 | Format.MP_FIXARRAY)
       codec1.pack(out, item._1)
       codec2.pack(out, item._2)
       codec3.pack(out, item._3)
@@ -64,7 +64,7 @@ object TupleCodecs {
     }
 
     val unpackFuncMap = FastByteMap[UnpackFunc](
-      (0x02 | Format.MP_FIXARRAY).toByte -> { in: DIS =>
+      (0x04 | Format.MP_FIXARRAY).toByte -> { in: DIS =>
         val r1 = codec1.unpack(in)
         val r2 = codec2.unpack(in)
         val r3 = codec3.unpack(in)
