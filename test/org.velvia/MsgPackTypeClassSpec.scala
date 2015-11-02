@@ -4,6 +4,8 @@ import java.math.{BigDecimal, BigInteger}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 
+import scala.util.Random
+
 class MsgPackTypeClassSpec extends FunSpec with Matchers {
   import org.velvia.msgpack._
   import org.velvia.msgpack.SimpleCodecs._
@@ -91,6 +93,34 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
       unpack[JArray](pack(aray)) should equal (aray)
       unpack[JValue](pack(aray)) should equal (aray)
       unpack[JValue](pack(map)) should equal (map)
+    }
+  }
+
+  describe("tuple packing and unpacking") {
+    import org.velvia.msgpack.TupleCodecs._
+
+    it("should pack and unpack Tuple2") {
+      val codec2 = new TupleCodec2[Int, Int]
+      val tuple2 = (Random.nextInt(), Random.nextInt())
+      val unpacked2 = unpack(pack(tuple2)(codec2))(codec2)
+      unpacked2.getClass should equal (classOf[(Int, Int)])
+      unpacked2 should equal (tuple2)
+    }
+
+    it("should pack and unpack Tuple3") {
+      val codec3 = new TupleCodec3[Int, Int, Int]
+      val tuple3 = (Random.nextInt(), Random.nextInt(), Random.nextInt())
+      val unpacked3 = unpack(pack(tuple3)(codec3))(codec3)
+      unpacked3.getClass should equal (classOf[(Int, Int, Int)])
+      unpacked3 should equal (tuple3)
+    }
+
+    it("should pack and unpack Tuple4") {
+      val codec4 = new TupleCodec4[Int, Int, Int, Int]
+      val tuple4 = (Random.nextInt(), Random.nextInt(), Random.nextInt(), Random.nextInt())
+      val unpacked4 = unpack(pack(tuple4)(codec4))(codec4)
+      unpacked4.getClass should equal (classOf[(Int, Int, Int, Int)])
+      unpacked4 should equal (tuple4)
     }
   }
 }
