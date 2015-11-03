@@ -51,6 +51,7 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
 
     val intSeqCodec = new SeqCodec[Int]
     val strIntMapCodec = new MapCodec[String, Int]
+    val intSetCodec = new SetCodec[Int]
 
     it("should pack and unpack Seqs and Arrays") {
       val seq1 = Seq(1, 2, 3, 4, 5)
@@ -63,6 +64,11 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
     it("should pack and unpack Maps") {
       val map = Map("apples" -> 1, "bears" -> -5, "oranges" -> 100)
       unpack(pack(map)(strIntMapCodec))(strIntMapCodec) should equal (map)
+    }
+
+    it("should pack and unpack Sets") {
+      val set = Set(1, 2, 3, 4, 5)
+      unpack(pack(set)(intSetCodec))(intSetCodec) should equal (set)
     }
   }
 
