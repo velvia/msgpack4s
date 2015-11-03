@@ -123,4 +123,44 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
       unpacked4 should equal (tuple4)
     }
   }
+
+  describe("case class packing and unpacking") {
+    import org.velvia.msgpack.CaseClassCodecs._
+
+    it("should pack and unpack case class of 1 parameter") {
+      case class C1(a: Int)
+      val codec = new CaseClassCodec1[C1, Int](C1.apply, C1.unapply)
+      val c = C1(Random.nextInt())
+      val unpacked = unpack(pack(c)(codec))(codec)
+      unpacked.getClass should equal (classOf[C1])
+      unpacked should equal (c)
+    }
+
+    it("should pack and unpack case class of 2 parameters") {
+      case class C2(a1: Int, a2: Int)
+      val codec2 = new CaseClassCodec2[C2, Int, Int](C2.apply, C2.unapply)
+      val c = C2(Random.nextInt(), Random.nextInt())
+      val unpacked = unpack(pack(c)(codec2))(codec2)
+      unpacked.getClass should equal (classOf[C2])
+      unpacked should equal (c)
+    }
+
+    it("should pack and unpack case class of 3 parameters") {
+      case class C3(a1: Int, a2: Int, a3: Int)
+      val codec = new CaseClassCodec3[C3, Int, Int, Int](C3.apply, C3.unapply)
+      val c = C3(Random.nextInt(), Random.nextInt(), Random.nextInt())
+      val unpacked = unpack(pack(c)(codec))(codec)
+      unpacked.getClass should equal (classOf[C3])
+      unpacked should equal (c)
+    }
+
+    it("should pack and unpack case class of 4 parameters") {
+      case class C4(a1: Int, a2: Int, a3: Int, a4: Int)
+      val codec = new CaseClassCodec4[C4, Int, Int, Int, Int](C4.apply, C4.unapply)
+      val c = C4(Random.nextInt(), Random.nextInt(), Random.nextInt(), Random.nextInt())
+      val unpacked = unpack(pack(c)(codec))(codec)
+      unpacked.getClass should equal (classOf[C4])
+      unpacked should equal (c)
+    }
+  }
 }
