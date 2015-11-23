@@ -1,5 +1,3 @@
-import bintray.Plugin.bintrayPublishSettings
-
 name := "msgpack4s"
 
 organization := "org.velvia"
@@ -25,8 +23,6 @@ lazy val playJson   = "com.typesafe.play" %% "play-json" % "2.4.1"
 libraryDependencies ++= Seq(rojomaJson % "provided",
                             json4s     % "provided",
                             playJson   % "provided")
-
-Seq(bintrayPublishSettings: _*)
 
 licenses += ("Apache-2.0", url("http://choosealicense.com/licenses/apache/"))
 
