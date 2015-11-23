@@ -1,5 +1,6 @@
 package org.velvia
 
+import scala.language.implicitConversions
 import java.io.DataInputStream
 
 /**
