@@ -1,10 +1,10 @@
 package org.velvia
 
 import java.io.{ByteArrayInputStream, DataInputStream}
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.FunSpec
 
-class MsgPackUtilsSpec extends FunSpec with ShouldMatchers {
+class MsgPackUtilsSpec extends FunSpec with Matchers {
 
   val seqIntRow = (Seq(10, "AZ", "mobile"), 8)
 
