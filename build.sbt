@@ -2,7 +2,7 @@ import bintray.Plugin.bintrayPublishSettings
 
 name := "msgpack4s"
 
-val commonSettings = Seq(scalaVersion := "2.11.7", organization := "org.velvia")
+val commonSettings = Seq(scalaVersion := "2.11.7", organization := "org.velvia", crossScalaVersions := Seq("2.10.4", "2.11.7"))
 
 unmanagedSourceDirectories in Compile <++= Seq(baseDirectory(_ / "src" )).join
 
