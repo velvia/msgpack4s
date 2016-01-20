@@ -169,4 +169,17 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
       unpacked should equal (c)
     }
   }
+
+  describe("bijection codecs") {
+    import org.velvia.msgpack.TransformCodecs._
+    import java.util.Date
+
+    it("should pack and unpack types that are in bijection with those having a codec") {
+      val codec = new TransformCodec[Date, Long](_.getTime, new Date(_))
+      val c = new Date
+      val unpacked = unpack(pack(c)(codec))(codec)
+      unpacked.getClass should equal (classOf[Date])
+      unpacked should equal (c)
+    }
+  }
 }
