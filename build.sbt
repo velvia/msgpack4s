@@ -2,11 +2,11 @@ import bintray.Plugin.bintrayPublishSettings
 
 name := "msgpack4s"
 
-organization := "org.velvia"
-
-scalaVersion := "2.10.4"
-
-crossScalaVersions := Seq("2.10.4", "2.11.5")
+val commonSettings = Seq(
+  scalaVersion := "2.11.7",
+  organization := "org.velvia",
+  crossScalaVersions := Seq("2.10.4", "2.11.7")
+)
 
 unmanagedSourceDirectories in Compile <++= Seq(baseDirectory(_ / "src" )).join
 
@@ -30,10 +30,11 @@ Seq(bintrayPublishSettings: _*)
 
 licenses += ("Apache-2.0", url("http://choosealicense.com/licenses/apache/"))
 
-lazy val msgpack4s = (project in file("."))
+lazy val msgpack4s = (project in file(".")).settings(commonSettings: _*)
 
 lazy val jmh = (project in file("jmh")).dependsOn(msgpack4s)
-                        .settings(jmhSettings:_*)
+                        .settings(commonSettings: _*)
+                        .settings(jmhSettings: _*)
                         .settings(libraryDependencies += rojomaJson)
                         .settings(libraryDependencies += json4s)
                         .settings(libraryDependencies += commonsIo)

@@ -4,6 +4,8 @@ import java.math.{BigDecimal, BigInteger}
 import org.scalatest.FunSpec
 import org.scalatest.Matchers
 
+import scala.util.Random
+
 class MsgPackTypeClassSpec extends FunSpec with Matchers {
   import org.velvia.msgpack._
   import org.velvia.msgpack.SimpleCodecs._
@@ -49,6 +51,7 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
 
     val intSeqCodec = new SeqCodec[Int]
     val strIntMapCodec = new MapCodec[String, Int]
+    val intSetCodec = new SetCodec[Int]
 
     it("should pack and unpack Seqs and Arrays") {
       val seq1 = Seq(1, 2, 3, 4, 5)
@@ -61,6 +64,11 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
     it("should pack and unpack Maps") {
       val map = Map("apples" -> 1, "bears" -> -5, "oranges" -> 100)
       unpack(pack(map)(strIntMapCodec))(strIntMapCodec) should equal (map)
+    }
+
+    it("should pack and unpack Sets") {
+      val set = Set(1, 2, 3, 4, 5)
+      unpack(pack(set)(intSetCodec))(intSetCodec) should equal (set)
     }
   }
 
@@ -91,6 +99,87 @@ class MsgPackTypeClassSpec extends FunSpec with Matchers {
       unpack[JArray](pack(aray)) should equal (aray)
       unpack[JValue](pack(aray)) should equal (aray)
       unpack[JValue](pack(map)) should equal (map)
+    }
+  }
+
+  describe("tuple packing and unpacking") {
+    import org.velvia.msgpack.TupleCodecs._
+
+    it("should pack and unpack Tuple2") {
+      val codec2 = new TupleCodec2[Int, Int]
+      val tuple2 = (Random.nextInt(), Random.nextInt())
+      val unpacked2 = unpack(pack(tuple2)(codec2))(codec2)
+      unpacked2.getClass should equal (classOf[(Int, Int)])
+      unpacked2 should equal (tuple2)
+    }
+
+    it("should pack and unpack Tuple3") {
+      val codec3 = new TupleCodec3[Int, Int, Int]
+      val tuple3 = (Random.nextInt(), Random.nextInt(), Random.nextInt())
+      val unpacked3 = unpack(pack(tuple3)(codec3))(codec3)
+      unpacked3.getClass should equal (classOf[(Int, Int, Int)])
+      unpacked3 should equal (tuple3)
+    }
+
+    it("should pack and unpack Tuple4") {
+      val codec4 = new TupleCodec4[Int, Int, Int, Int]
+      val tuple4 = (Random.nextInt(), Random.nextInt(), Random.nextInt(), Random.nextInt())
+      val unpacked4 = unpack(pack(tuple4)(codec4))(codec4)
+      unpacked4.getClass should equal (classOf[(Int, Int, Int, Int)])
+      unpacked4 should equal (tuple4)
+    }
+  }
+
+  describe("case class packing and unpacking") {
+    import org.velvia.msgpack.CaseClassCodecs._
+
+    it("should pack and unpack case class of 1 parameter") {
+      case class C1(a: Int)
+      val codec = new CaseClassCodec1[C1, Int](C1.apply, C1.unapply)
+      val c = C1(Random.nextInt())
+      val unpacked = unpack(pack(c)(codec))(codec)
+      unpacked.getClass should equal (classOf[C1])
+      unpacked should equal (c)
+    }
+
+    it("should pack and unpack case class of 2 parameters") {
+      case class C2(a1: Int, a2: Int)
+      val codec2 = new CaseClassCodec2[C2, Int, Int](C2.apply, C2.unapply)
+      val c = C2(Random.nextInt(), Random.nextInt())
+      val unpacked = unpack(pack(c)(codec2))(codec2)
+      unpacked.getClass should equal (classOf[C2])
+      unpacked should equal (c)
+    }
+
+    it("should pack and unpack case class of 3 parameters") {
+      case class C3(a1: Int, a2: Int, a3: Int)
+      val codec = new CaseClassCodec3[C3, Int, Int, Int](C3.apply, C3.unapply)
+      val c = C3(Random.nextInt(), Random.nextInt(), Random.nextInt())
+      val unpacked = unpack(pack(c)(codec))(codec)
+      unpacked.getClass should equal (classOf[C3])
+      unpacked should equal (c)
+    }
+
+    it("should pack and unpack case class of 4 parameters") {
+      case class C4(a1: Int, a2: Int, a3: Int, a4: Int)
+      val codec = new CaseClassCodec4[C4, Int, Int, Int, Int](C4.apply, C4.unapply)
+      val c = C4(Random.nextInt(), Random.nextInt(), Random.nextInt(), Random.nextInt())
+      val unpacked = unpack(pack(c)(codec))(codec)
+      unpacked.getClass should equal (classOf[C4])
+      unpacked should equal (c)
+    }
+  }
+
+  describe("bijection codecs") {
+    import org.velvia.msgpack.TransformCodecs._
+    import java.util.Date
+
+    it("should pack and unpack types that are in bijection with those having a codec") {
+      val codec = new TransformCodec[Date, Long](_.getTime, new Date(_))
+      val c = new Date
+      val unpacked = unpack(pack(c)(codec))(codec)
+      unpacked.getClass should equal (classOf[Date])
+      unpacked should equal (c)
     }
   }
 }

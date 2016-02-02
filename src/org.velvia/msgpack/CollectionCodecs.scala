@@ -46,4 +46,13 @@ object CollectionCodecs {
       (MP_FIXMAP | len).toByte -> { in: DIS => unpackMap(len, in)(keyCodec, valCodec) }
     }
   }
+
+  class SetCodec[T: Codec] extends Codec[Set[T]] {
+    private val seqCodec = new SeqCodec[T]
+    def pack(out: DataOutputStream, s: Set[T]): Unit = {
+      seqCodec.pack(out, s.toSeq)
+    }
+    val unpackFuncMap = seqCodec.unpackFuncMap.mapValues(_.andThen(_.toSet))
+  }
+
 }
