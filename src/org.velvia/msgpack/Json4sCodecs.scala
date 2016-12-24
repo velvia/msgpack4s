@@ -37,10 +37,21 @@ object Json4sCodecs {
     val unpackFuncMap = BigIntegerCodec.unpackFuncMap.mapValues(_.andThen(JInt(_)))
   }
 
+  implicit object JLongCodec extends Codec[JLong] {
+    def pack(out: DataOutputStream, item: JLong) { LongCodec.pack(out, item.num) }
+    val unpackFuncMap = LongCodec.unpackFuncMap.mapValues(_.andThen(JLong(_)))
+  }
+
   implicit object JArrayCodec extends Codec[JArray] {
     lazy val seqCodec = new CollectionCodecs.SeqCodec()(JValueCodec)
     def pack(out: DataOutputStream, a: JArray) { seqCodec.pack(out, a.arr) }
     lazy val unpackFuncMap = seqCodec.unpackFuncMap.mapValues(_.andThen(s => JArray(s.toList)))
+  }
+
+  implicit object JSetCodec extends Codec[JSet] {
+    lazy val seqCodec = new CollectionCodecs.SeqCodec()(JValueCodec)
+    def pack(out: DataOutputStream, a: JSet) { seqCodec.pack(out, a.set.toSeq) }
+    lazy val unpackFuncMap = seqCodec.unpackFuncMap.mapValues(_.andThen(s => JSet(s.toSet)))
   }
 
   implicit object JObjectCodec extends Codec[JObject] {
@@ -56,6 +67,8 @@ object Json4sCodecs {
         case j: JObject  => JObjectCodec.pack(out, j)
         case j: JDouble  => JDoubleCodec.pack(out, j)
         case j: JInt     => JIntCodec.pack(out, j)
+        case j: JLong    => JLongCodec.pack(out, j)
+        case j: JSet     => JSetCodec.pack(out, j)
         case j: JArray   => JArrayCodec.pack(out, j)
         case j: JDecimal => JDecimalCodec.pack(out, j)
         case j: JBool    => JBoolCodec.pack(out, j)
@@ -70,6 +83,8 @@ object Json4sCodecs {
                         JDecimalCodec.unpackFuncMap.mapAs[JValue] ++
                         JDoubleCodec.unpackFuncMap.mapAs[JValue] ++
                         JIntCodec.unpackFuncMap.mapAs[JValue] ++
+                        JLongCodec.unpackFuncMap.mapAs[JValue] ++
+                        JSetCodec.unpackFuncMap.mapAs[JValue] ++
                         JArrayCodec.unpackFuncMap.mapAs[JValue] ++
                         JObjectCodec.unpackFuncMap.mapAs[JValue]
   }
