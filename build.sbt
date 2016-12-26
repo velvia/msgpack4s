@@ -5,7 +5,7 @@ name := "msgpack4s"
 val commonSettings = Seq(
   scalaVersion := "2.12.0",
   organization := "org.velvia",
-  crossScalaVersions := Seq("2.10.4", "2.11.7", "2.12.0")
+  crossScalaVersions := Seq("2.11.7", "2.12.0")
 )
 
 unmanagedSourceDirectories in Compile <++= Seq(baseDirectory(_ / "src" )).join
