@@ -19,7 +19,7 @@ object PlayJsonCodecs {
 
   implicit object JsBooleanCodec extends Codec[JsBoolean] {
     def pack(out: DataOutputStream, item: JsBoolean): Unit = { BooleanCodec.pack(out, item.value) }
-    val unpackFuncMap = BooleanCodec.unpackFuncMap.mapValues(_.andThen(JsBoolean(_)))
+    val unpackFuncMap: FastByteMap[(DIS) => JsBoolean] = BooleanCodec.unpackFuncMap.mapValues(_.andThen(JsBoolean(_)))
   }
 
   implicit object JsStringCodec extends Codec[JsString] {
