@@ -30,7 +30,7 @@ resolvers += "velvia maven" at "http://dl.bintray.com/velvia/maven"
 libraryDependencies += "org.velvia" %% "msgpack4s" % "0.5.2"
 ```
 
-Currently cross-compiled for Scala 2.10 and 2.11.
+Currently cross-compiled for Scala 2.11 and 2.12.
 
 You will probably want to use the type-safe API that uses TypeClasses:
 
