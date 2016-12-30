@@ -30,6 +30,8 @@ resolvers += "velvia maven" at "http://dl.bintray.com/velvia/maven"
 libraryDependencies += "org.velvia" %% "msgpack4s" % "0.6.0"
 ```
 
+The jars are published to JCenter as well.  If you are using newer versions of SBT that resolve JCenter, you should not need to add the resolvers.
+
 Currently cross-compiled for Scala 2.11 and 2.12.
 
 You will probably want to use the type-safe API that uses TypeClasses:
