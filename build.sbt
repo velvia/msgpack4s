@@ -1,5 +1,3 @@
-import bintray.Plugin.bintrayPublishSettings
-
 name := "msgpack4s"
 
 val commonSettings = Seq(
@@ -26,9 +24,20 @@ libraryDependencies ++= Seq(rojomaJson % "provided",
                             json4s     % "provided",
                             playJson   % "provided")
 
-Seq(bintrayPublishSettings: _*)
-
 licenses += ("Apache-2.0", url("http://choosealicense.com/licenses/apache/"))
+
+// POM settings for Sonatype
+homepage := Some(url("https://github.com/velvia/msgpack4s"))
+
+scmInfo := Some(ScmInfo(url("https://github.com/velvia/msgpack4s"),
+                            "git@github.com:velvia/msgpack4s.git"))
+
+developers := List(Developer("velvia",
+                        "Evan Chan",
+                        "velvia@gmail.com",
+                        url("https://github.com/velvia")))
+
+pomIncludeRepository := (_ => false)
 
 lazy val msgpack4s = (project in file(".")).settings(commonSettings: _*)
 
