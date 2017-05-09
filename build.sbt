@@ -1,3 +1,5 @@
+import ReleaseTransformations._
+
 name := "msgpack4s"
 
 val commonSettings = Seq(
@@ -38,6 +40,21 @@ developers := List(Developer("velvia",
                         url("https://github.com/velvia")))
 
 pomIncludeRepository := (_ => false)
+
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  runTest,
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  ReleaseStep(action = Command.process("publishSigned", _)),
+  setNextVersion,
+  commitNextVersion,
+  ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+  pushChanges
+)
 
 lazy val msgpack4s = (project in file(".")).settings(commonSettings: _*)
 
